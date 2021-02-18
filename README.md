@@ -15,12 +15,27 @@ Building real-time log analytics solution using GDN
 TBD
 
 **How to Run:**
-```
-git clone https://github.com/Macrometacorp/tutorial-log-analytics.git
-cd tutorial-log-analytics
-npm install
-node app.js
-```
+**On Federation:**
+> Create following CEP Apps in your federation
+> ```
+> 1. log_processor
+> 2. agg_code_processor
+> 3. agg_verb_processor
+> ```
+
+**On Development Machine:**
+> ```
+> git clone https://github.com/Macrometacorp/tutorial-log-analytics.git
+> cd tutorial-log-analytics
+> 
+> // Configure federation details in app.js
+> const global_url = "https://prashant.eng.macrometa.io";
+> const userName = "mm@macrometa.io";
+> const password = "Macrometa123!@#";
+> 
+> npm install
+> node app.js
+> ```
 
 ### Stream Workers
 
