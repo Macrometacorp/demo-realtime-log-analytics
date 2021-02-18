@@ -2,14 +2,16 @@ const jsc8 = require('jsc8');
 const fs = require('fs');
 const readline = require('readline');
 
+// Configure the federation
 const global_url = "https://prashant.eng.macrometa.io";
 const userName = "mm@macrometa.io";
 const password = "Macrometa123!@#";
+
+const logFilePath = "./server.log";
+const input_log_stream = "input_log_stream";
+
 const client = new jsc8(global_url);
 let count = 0;
-
-const logFilePath = "./server.log"; //access_part //access //noramlized_1L //noramlized.log
-const input_log_stream = "input_log_stream";
 let producer;
 let rd;
 const start = new Date().getTime();
