@@ -41,7 +41,10 @@ async function processLineByLine() {
       }
   });
    rd.on('close', function(line) {
+    
+    //EOF - This is important line. This gives indication to log_processor app that lof file has been processed.
     const lastLog=`13.66.139.0 - - [12/Feb/2020:00:00:23 +0100] "EOF /index.php?option=com_phocagallery&view=category&id=1:almhuette-raith&Itemid=53 HTTP/1.1" 404 32653 "-" "Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)" "-"`;
+    
     console.log("Finished all the logs in the log file. Sending EOF flag.");
     handlePublish(lastLog);
     const end = new Date().getTime();
