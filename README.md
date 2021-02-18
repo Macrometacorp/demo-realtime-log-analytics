@@ -15,7 +15,7 @@ Building real-time log analytics solution using GDN
 TBD
 
 **How to Run:**
-TBD
+node app.js
 
 ### Stream Workers
 
