@@ -1,0 +1,9 @@
+# Directories
+.cache/
+dist/
+frontend-build/
+node_modules/
+
+# Dotfiles
+.DS_Store
+.env

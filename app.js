@@ -2,15 +2,16 @@ const jsc8 = require('jsc8');
 const fs = require('fs');
 const readline = require('readline');
 
-// Configure the federation
+// Configure the federation details
 const global_url = "https://prashant.eng.macrometa.io";
 const userName = "mm@macrometa.io";
 const password = "Macrometa123!@#";
 
-const logFilePath = "./server.log";
+// Configure log file and input stream name if required
+const logFilePath = "./server.log"; // testlogs.log can be used for testing. It has fewer logs.
 const input_log_stream = "input_log_stream";
 
-const client = new jsc8(global_url);
+const eofFlag = "EOF";
 let count = 0;
 let producer;
 let rd;
@@ -40,13 +41,17 @@ async function processLineByLine() {
         console.error("Could not process line:",line);
       }
   });
-   rd.on('close', function(line) {
+
+  rd.on('close', function(line) {
     
-    //EOF - This is important line. This gives indication to log_processor app that lof file has been processed.
-    const lastLog=`13.66.139.0 - - [12/Feb/2020:00:00:23 +0100] "EOF /index.php?option=com_phocagallery&view=category&id=1:almhuette-raith&Itemid=53 HTTP/1.1" 404 32653 "-" "Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)" "-"`;
+    // This is important line. 
+    // The line has `EOF` flag that will be read as `verb`
+    // This gives indication to log_processor app that log file has been processed till the end
+    // CEP App will then purge the cached
+    const eofLog=`13.66.139.0 - - [12/Feb/2021:00:00:23 +0100] "${eofFlag} /index.php?option=com_phocagallery&view=category&id=1:almhuette-raith&Itemid=53 HTTP/1.1" 404 32653 "-" "Mozilla/5.0 (compatible; bingbot/2.0; +https://www.macrometa.com)" "-"`;
     
     console.log("Finished all the logs in the log file. Sending EOF flag.");
-    handlePublish(lastLog);
+    handlePublish(eofLog);
     const end = new Date().getTime();
     const time = ( end - start) / 1000;
     console.log(`Published ${count} logs in ${time} seconds.`);
@@ -54,6 +59,7 @@ async function processLineByLine() {
 }
 
 (async function() {
+  const client = new jsc8(global_url);
   await client.login(userName, password);
     
   try{

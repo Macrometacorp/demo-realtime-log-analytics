@@ -15,6 +15,9 @@ Building real-time log analytics solution using GDN
 TBD
 
 **How to Run:**
+git clone https://github.com/Macrometacorp/tutorial-log-analytics.git
+cd tutorial-log-analytics
+npm install
 node app.js
 
 ### Stream Workers
