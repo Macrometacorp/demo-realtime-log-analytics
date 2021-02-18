@@ -8,7 +8,7 @@ const password = "Macrometa123!@#";
 const client = new jsc8(global_url);
 let count = 0;
 
-const logFilePath = "./few.log"; //access_part //access //noramlized_1L //noramlized.log
+const logFilePath = "./server.log"; //access_part //access //noramlized_1L //noramlized.log
 const input_log_stream = "input_log_stream";
 let producer;
 let rd;
