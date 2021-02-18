@@ -31,7 +31,7 @@ TBD
 > // Configure federation details in app.js
 > const global_url = "https://prashant.eng.macrometa.io";
 > const userName = "mm@macrometa.io";
-> const password = "Macrometa123!@#";
+> const password = "***************";
 > 
 > npm install
 > node app.js
