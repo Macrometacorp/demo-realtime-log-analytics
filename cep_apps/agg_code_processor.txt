@@ -1,0 +1,90 @@
+@App:name("agg_code_processor")
+@App:description("Process aggregated code counts")
+
+
+-- Populate and update the code-counter map. Increment counter value for the current verb
+define function updateCache[javascript] return string {
+    var code = data[0].toString();
+    var cachedValue = data[1];
+    let map = JSON.parse(cachedValue);
+    typeof map[code] == 'undefined' ? map[code] = 1 : map[code]++;
+
+    return JSON.stringify(map);
+};
+
+
+-- Convert the record into JSON object
+define function toJson[javascript] return object {
+    const cache = data[0];
+    return  JSON.parse(data[0]);
+};
+
+
+-- Collection does not support key having special caracter like / and :
+-- Replace such characters with _ (underscore)
+define function getKey[javascript] return string {
+    return  data[0].replace(/\//g,"_").replace(/:/g,"_");
+};
+
+
+@store(type='c8db', collection='http_code_agg_counts', replication.type="local", @map(type='json'))
+define table http_code_agg_counts(timestamp string, map object);
+
+@source(type='c8streams', stream.list='http_intermediate_agg_counts', replication.type="local", @map(type='json'))
+define stream http_intermediate_agg_counts(timestamp string, verb string, code int, url string);
+
+@store(type='c8db', collection='put_in_cache', replication.type="local", @map(type='json'))
+define table put_in_cache(isVerbPut bool, isTimestampPut bool, oldData bool);
+
+
+-- Maintain timestamp from the log in the cache
+select
+    ifThenElse(cache:get(getKey(timestamp), "") == "", 
+        cache:put(getKey(timestamp),updateCache(code, "{}")), 
+        cache:put(getKey(timestamp),updateCache(code, cache:get(getKey(timestamp))))
+    ) as isVerbPut,
+    false as isTimestampPut,
+    false as oldData
+    from http_intermediate_agg_counts
+insert into put_in_cache;
+
+
+-- When a log with new minute arrives
+-- Get the old timestamp value 
+-- And the previously aggregated cached data for that timestamp 
+-- Insert that into the collection.
+-- Skip insert if previously aggregated cached data is not available. i.e., 1st log from the file
+select
+    cache:get("old_timestamp", "") as timestamp,
+    toJson(cache:get("old_timestamp_data", "")) as map
+    from http_intermediate_agg_counts[
+        false==str:equalsIgnoreCase(getKey(cache:get("old_timestamp_key", "")), getKey(timestamp))
+        and false==str:equalsIgnoreCase(cache:get("old_timestamp_data", "") ,"")
+    ]
+INSERT into http_code_agg_counts;
+
+
+-- Update the cache with
+-- old_timestamp_key    Ex. `11_Feb_2020_13_56_00`
+-- old_timestamp        Ex. `11/Feb/2020:13:56:00`
+-- old_timestamp_data   Ex.  `{'map': { '200': 3, '400': 1, '401': 1, '505': 1 }}`
+select
+    cache:put("old_timestamp_key", getKey(timestamp)) as isVerbPut,
+    cache:put("old_timestamp", timestamp) as isTimestampPut,
+    cache:put("old_timestamp_data", cache:get(getKey(timestamp))) as oldData
+    from http_intermediate_agg_counts[
+        false==str:equalsIgnoreCase(verb, "EOF")
+    ]
+insert into put_in_cache;
+
+
+-- Once file has been processed, it is required to purge the cache
+-- The JS client app will send a dummy log with `EOF` text in the verb field
+select
+    cache:purge() as isVerbPut,
+    false as isTimestampPut,
+    false as oldData
+    from http_intermediate_agg_counts[
+        str:equalsIgnoreCase(verb, "EOF")
+    ]
+insert into put_in_cache;

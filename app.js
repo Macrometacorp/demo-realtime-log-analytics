@@ -5,7 +5,7 @@ const readline = require('readline');
 // Configure the federation details
 const global_url = "https://prashant.eng.macrometa.io";
 const userName = "mm@macrometa.io";
-const password = "Macrometa123!@#";
+const password = "***************";
 
 // Configure log file and input stream name if required
 const logFilePath = "./server.log"; // testlogs.log can be used for testing. It has fewer logs.
@@ -50,11 +50,11 @@ async function processLineByLine() {
     // CEP App will then purge the cached
     const eofLog=`13.66.139.0 - - [12/Feb/2021:00:00:23 +0100] "${eofFlag} /index.php?option=com_phocagallery&view=category&id=1:almhuette-raith&Itemid=53 HTTP/1.1" 404 32653 "-" "Mozilla/5.0 (compatible; bingbot/2.0; +https://www.macrometa.com)" "-"`;
     
-    console.log("Finished all the logs in the log file. Sending EOF flag.");
+    console.log("Sending EOF flag.");
     handlePublish(eofLog);
     const end = new Date().getTime();
     const time = ( end - start) / 1000;
-    console.log(`Published ${count} logs in ${time} seconds.`);
+    console.log(`Published ${count} logs in ${time} seconds. It will take some time to reflect aggregated records in the collection.`);
   });
 }
 
