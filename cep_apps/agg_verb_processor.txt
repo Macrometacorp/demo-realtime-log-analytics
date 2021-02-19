@@ -31,8 +31,8 @@ define stream http_intermediate_agg_counts(timestamp string, verb string, code i
 @store(type='c8db', collection='http_verb_agg_counts', replication.type="local", @map(type='json'))
 define table http_verb_agg_counts( timestamp string, map object);
 
-@store(type='c8db', collection='put_in_cache', replication.type="local", @map(type='json'))
-define table put_in_cache(isVerbPut bool, isTimestampPut bool,oldData bool);
+@store(type='c8streams', collection='put_in_cache', replication.type="local", @map(type='json'))
+define stream put_in_cache(isVerbPut bool, isTimestampPut bool,oldData bool);
 
 -- Maintain timestamp from the log in the cache
 select
