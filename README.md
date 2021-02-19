@@ -30,8 +30,8 @@ TBD
 > cd tutorial-log-analytics
 > 
 > // Configure federation details in app.js
-> const global_url = "https://prashant.eng.macrometa.io";
-> const userName = "mm@macrometa.io";
+> const global_url = "https://gdn.paas.macrometa.io";
+> const userName = "demo@macrometa.io";
 > const password = "***************";
 > 
 > npm install
@@ -44,6 +44,7 @@ TBD
 ```
 @App:name("log_processor")
 @App:description("Process error logs")
+
 
 -- Read the incoming log and extract verb, code, url, timestamp
 define function parseLog[javascript] return string {
@@ -109,7 +110,6 @@ SELECT
     parseLog(log, 'url') as url
 FROM input_log_stream
 INSERT into http_intermediate_agg_counts;
-
 ```
 
 
@@ -122,10 +122,10 @@ INSERT into http_intermediate_agg_counts;
 
 -- Populate and update the code-counter map. Increment counter value for the current verb
 define function updateCache[javascript] return string {
-    var verb = data[0].toString();
+    var code = data[0].toString();
     var cachedValue = data[1];
     let map = JSON.parse(cachedValue);
-    typeof map[verb] == 'undefined' ? map[verb] = 1 : map[verb]++;
+    typeof map[code] == 'undefined' ? map[code] = 1 : map[code]++;
 
     return JSON.stringify(map);
 };
@@ -134,7 +134,12 @@ define function updateCache[javascript] return string {
 -- Convert the record into JSON object
 define function toJson[javascript] return object {
     const cache = data[0];
-    return  JSON.parse(data[0]);
+    let json =  JSON.parse(cache);
+    
+    const timestamp = data[1];
+    json.timestamp = timestamp;
+    
+    return  json;
 };
 
 
@@ -146,13 +151,13 @@ define function getKey[javascript] return string {
 
 
 @store(type='c8db', collection='http_code_agg_counts', replication.type="local", @map(type='json'))
-define table http_code_agg_counts(timestamp string, map object);
+define table http_code_agg_counts(log object);
 
 @source(type='c8streams', stream.list='http_intermediate_agg_counts', replication.type="local", @map(type='json'))
 define stream http_intermediate_agg_counts(timestamp string, verb string, code int, url string);
 
-@store(type='c8db', collection='put_in_cache', replication.type="local", @map(type='json'))
-define table put_in_cache(isVerbPut bool, isTimestampPut bool, oldData bool);
+@store(type='c8streams', collection='put_in_cache', replication.type="local", @map(type='json'))
+define stream put_in_cache(isVerbPut bool, isTimestampPut bool, oldData bool);
 
 
 -- Maintain timestamp from the log in the cache
@@ -173,8 +178,7 @@ insert into put_in_cache;
 -- Insert that into the collection.
 -- Skip insert if previously aggregated cached data is not available. i.e., 1st log from the file
 select
-    cache:get("old_timestamp", "") as timestamp,
-    toJson(cache:get("old_timestamp_data", "")) as map
+    toJson(cache:get("old_timestamp_data", ""), cache:get("old_timestamp", "")) as log
     from http_intermediate_agg_counts[
         false==str:equalsIgnoreCase(getKey(cache:get("old_timestamp_key", "")), getKey(timestamp))
         and false==str:equalsIgnoreCase(cache:get("old_timestamp_data", "") ,"")
@@ -216,9 +220,9 @@ insert into put_in_cache;
 @App:description("Process aggregated verb counts")
 
 
--- Populate and update the verb-counter map. Increment counter value for the current verb
+-- Populate and update the verb-counter map. Increment counter value by 1 for the current verb.
 define function updateCache[javascript] return string {
-    var verb = data[0].toString();
+    var verb = data[0];
     var cachedValue = data[1];
     let map = JSON.parse(cachedValue);
     typeof map[verb] == 'undefined' ? map[verb] = 1 : map[verb]++;
@@ -226,13 +230,16 @@ define function updateCache[javascript] return string {
     return JSON.stringify(map);
 };
 
-
--- Convert the record into JSON object
+-- Convert the record into JSON
 define function toJson[javascript] return object {
     const cache = data[0];
-    return  JSON.parse(data[0]);
+    let json =  JSON.parse(cache);
+    
+    const timestamp = data[1];
+    json.timestamp = timestamp;
+    
+    return  json;
 };
-
 
 -- Collection does not support key having special caracter like / and :
 -- Replace such characters with _ (underscore)
@@ -241,26 +248,25 @@ define function getKey[javascript] return string {
 };
 
 
-@store(type='c8db', collection='http_verb_agg_counts', replication.type="local", @map(type='json'))
-define table http_verb_agg_counts(timestamp string, map object);
-
 @source(type='c8streams', stream.list='http_intermediate_agg_counts', replication.type="local", @map(type='json'))
 define stream http_intermediate_agg_counts(timestamp string, verb string, code int, url string);
 
-@store(type='c8db', collection='put_in_cache', replication.type="local", @map(type='json'))
-define table put_in_cache(isVerbPut bool, isTimestampPut bool, oldData bool);
+@store(type='c8db', collection='http_verb_agg_counts', replication.type="local", @map(type='json'))
+define table http_verb_agg_counts(log object);
 
+@store(type='c8streams', collection='put_in_cache', replication.type="local", @map(type='json'))
+define stream put_in_cache(isVerbPut bool, isTimestampPut bool,oldData bool);
 
 -- Maintain timestamp from the log in the cache
 select
-    ifThenElse(cache:get(getKey(timestamp), "") == "", 
-        cache:put(getKey(timestamp),updateCache(verb, "{}")), 
-        cache:put(getKey(timestamp),updateCache(verb, cache:get(getKey(timestamp))))
-    ) as isVerbPut,
-    false as isTimestampPut,
-    false as oldData
-    from http_intermediate_agg_counts
+ifThenElse(cache:get(getKey(timestamp),"") == "", 
+    cache:put(getKey(timestamp),updateCache(verb,"{}")), 
+    cache:put(getKey(timestamp),updateCache(verb,cache:get(getKey(timestamp))))) as isVerbPut,
+false as isTimestampPut,
+false as oldData
+from http_intermediate_agg_counts
 insert into put_in_cache;
+
 
 
 -- When a log with new minute arrives
@@ -269,12 +275,9 @@ insert into put_in_cache;
 -- Insert that into the collection.
 -- Skip insert if previously aggregated cached data is not available. i.e., 1st log from the file
 select
-    cache:get("old_timestamp", "") as timestamp,
-    toJson(cache:get("old_timestamp_data", "")) as map
-    from http_intermediate_agg_counts[
-        false==str:equalsIgnoreCase(getKey(cache:get("old_timestamp_key", "")), getKey(timestamp))
-        and false==str:equalsIgnoreCase(cache:get("old_timestamp_data", "") ,"")
-    ]
+    toJson(cache:get("old_timestamp_data",""), cache:get("old_timestamp","")) as log
+from http_intermediate_agg_counts[false==str:equalsIgnoreCase(cache:get("old_timestamp_data",""),"")
+    and false==str:equalsIgnoreCase(getKey(cache:get("old_timestamp_key","")), getKey(timestamp))]
 INSERT into http_verb_agg_counts;
 
 
@@ -283,12 +286,10 @@ INSERT into http_verb_agg_counts;
 -- old_timestamp        Ex. `11/Feb/2020:13:56:00`
 -- old_timestamp_data   Ex.  `{'map': { '200': 3, '400': 1, '401': 1, '505': 1 }}`
 select
-    cache:put("old_timestamp_key", getKey(timestamp)) as isVerbPut,
-    cache:put("old_timestamp", timestamp) as isTimestampPut,
-    cache:put("old_timestamp_data", cache:get(getKey(timestamp))) as oldData
-    from http_intermediate_agg_counts[
-        false==str:equalsIgnoreCase(verb, "EOF")
-    ]
+    cache:put("old_timestamp_key",getKey(timestamp)) as isVerbPut,
+    cache:put("old_timestamp",timestamp) as isTimestampPut,
+    cache:put("old_timestamp_data",cache:get(getKey(timestamp))) as oldData
+from http_intermediate_agg_counts[false==str:equalsIgnoreCase(verb,"EOF")]
 insert into put_in_cache;
 
 
@@ -298,9 +299,7 @@ select
     cache:purge() as isVerbPut,
     false as isTimestampPut,
     false as oldData
-    from http_intermediate_agg_counts[
-        str:equalsIgnoreCase(verb, "EOF")
-    ]
+from http_intermediate_agg_counts[str:equalsIgnoreCase(verb,"EOF")]
 insert into put_in_cache;
 ```
 

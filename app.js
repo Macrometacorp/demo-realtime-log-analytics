@@ -3,8 +3,8 @@ const fs = require('fs');
 const readline = require('readline');
 
 // Configure the federation details
-const global_url = "https://prashant.eng.macrometa.io";
-const userName = "mm@macrometa.io";
+const global_url = "https://gdn.paas.macrometa.io";
+const userName = "demo@macrometa.io";
 const password = "***************";
 
 // Configure log file and input stream name if required
