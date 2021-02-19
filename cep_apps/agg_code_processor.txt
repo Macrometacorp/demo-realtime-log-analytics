@@ -16,7 +16,12 @@ define function updateCache[javascript] return string {
 -- Convert the record into JSON object
 define function toJson[javascript] return object {
     const cache = data[0];
-    return  JSON.parse(data[0]);
+    let json =  JSON.parse(cache);
+    
+    const timestamp = data[1];
+    json.timestamp = timestamp;
+    
+    return  json;
 };
 
 
@@ -28,13 +33,13 @@ define function getKey[javascript] return string {
 
 
 @store(type='c8db', collection='http_code_agg_counts', replication.type="local", @map(type='json'))
-define table http_code_agg_counts(timestamp string, map object);
+define table http_code_agg_counts(log object);
 
 @source(type='c8streams', stream.list='http_intermediate_agg_counts', replication.type="local", @map(type='json'))
 define stream http_intermediate_agg_counts(timestamp string, verb string, code int, url string);
 
-@store(type='c8db', collection='put_in_cache', replication.type="local", @map(type='json'))
-define table put_in_cache(isVerbPut bool, isTimestampPut bool, oldData bool);
+@store(type='c8streams', collection='put_in_cache', replication.type="local", @map(type='json'))
+define stream put_in_cache(isVerbPut bool, isTimestampPut bool, oldData bool);
 
 
 -- Maintain timestamp from the log in the cache
@@ -55,8 +60,7 @@ insert into put_in_cache;
 -- Insert that into the collection.
 -- Skip insert if previously aggregated cached data is not available. i.e., 1st log from the file
 select
-    cache:get("old_timestamp", "") as timestamp,
-    toJson(cache:get("old_timestamp_data", "")) as map
+    toJson(cache:get("old_timestamp_data", ""), cache:get("old_timestamp", "")) as log
     from http_intermediate_agg_counts[
         false==str:equalsIgnoreCase(getKey(cache:get("old_timestamp_key", "")), getKey(timestamp))
         and false==str:equalsIgnoreCase(cache:get("old_timestamp_data", "") ,"")
