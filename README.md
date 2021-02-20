@@ -11,6 +11,7 @@ Building real-time log analytics solution using GDN
 
 ### Log Producer
 
+***Deployed At:*** http://localhost:3000/
 **Build:**
 TBD
 
