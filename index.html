@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+const eofFlag = "EOF";
+let count = 0;
+
+function convert(line){
+    const message = {
+    "log":line,
+  };
+  return JSON.stringify(message);    
+}
+
+function pulbish(log) {
+    $.ajax({
+        url: 'https://api-prashant.eng.macrometa.io/_fabric/_system/_api/streams/c8locals.input_log_stream/publish?global=false',
+        type: 'POST',
+        contentType: 'application/json',
+        callback: '?',
+        data: convert(log),
+        datatype: 'application/json',
+        success: function(result) { 
+            console.log(result); 
+        },
+        error: function(err) {  
+            console.log('Failed!' + err); 
+        },
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Authorization", "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjEuNjEzODk2MjU3NTIwNDMwN2UrNiwiZXhwIjoxNjEzOTM5NDU3LCJpc3MiOiJtYWNyb21ldGEiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJyb290IiwidGVuYW50IjoiX21tIn0=.hFeltAtpjna7IM20AQ_Qxr6P8ZKzZW0SFkS5-hWzQxQ=");
+        }
+    });
+}
+
+function startPublishing() {
+    $.ajax({
+        url: 'https://raw.githubusercontent.com/Macrometacorp/tutorial-log-analytics/main/testlogs.log?token=ARWTGKNQHDVNPYLKZHUOGQ3AHNISC',
+        type: 'GET',
+        callback: '?',
+        datatype: 'application/json',
+        success: function(result) { 
+            console.log(result); 
+            var lines = result.split("\n");
+            for (var i = 0, len = lines.length; i < len; i++) {
+                console.log("Read >> " + lines[i]);
+                pulbish(lines[i]);
+                count++;
+            }
+            console.log("Sending EOF flag...");
+            const eofLog=`13.66.139.0 - - [12/Feb/2021:00:00:23 +0100] "${eofFlag} /index.php?option=com_phocagallery&view=category&id=1:almhuette-raith&Itemid=53 HTTP/1.1" 404 32653 "-" "Mozilla/5.0 (compatible; bingbot/2.0; +https://www.macrometa.com)" "-"`;
+            pulbish(eofLog);
+            const end = new Date().getTime();
+            const time = ( end - start) / 1000;
+            console.log(`Published ${count} logs in ${time} seconds. It will take some time to reflect aggregated records in the collection.`);
+        },
+        error: function() { alert('Failed!'); },
+        //beforeSend: setHeader
+
+    });  
+}
+
+// A $( document ).ready() block.
+$( document ).ready(function() {
+    console.log( "Starting to publish..." );
+    //startPublishing();
+});
+
+</script>
+</head>
+<body>
+    <h3>Publishing has alredy been started on page load. Plase check the collection.</h3></br>
+</body>
+</html>
