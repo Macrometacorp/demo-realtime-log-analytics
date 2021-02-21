@@ -11,6 +11,8 @@ Building real-time log analytics solution using GDN
 
 ### Log Producer
 
+To publish the logs please click here https://pzombade.github.io/mm-log-publisher/
+
 **Build:**
 TBD
 
