@@ -28,7 +28,7 @@ TBD
 
 **On Development Machine:**
 > ```
-> git clone https://github.com/Macrometacorp/tutorial-log-analytics.git
+> git clone https://macrometacorp.github.io/tutorial-log-analytics/
 > cd tutorial-log-analytics
 > 
 > // Configure federation details in app.js
