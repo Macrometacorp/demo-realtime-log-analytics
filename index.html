@@ -124,7 +124,7 @@
     }
 
     .main-header {
-      margin-top: 50px;
+      margin-top: 25px;
     }
 
     .publis-button:hover{
@@ -160,6 +160,7 @@
 
     ul{
         list-style-type: none;
+        margin-top: 30px;
     }
 
     li span{
@@ -172,10 +173,11 @@
 </style>
 </head>
 <body>
-    <h1 class="center main-header">Macrometa Realtime Log Analytics Demo</h1>
-    <h2 class="center">(Log Producer)</h2>
-    <div class="center"><button class="publis-button" onclick="main()">Publish</button></div>
-
+    <div id="head">
+        <h1 class="center main-header">Macrometa Realtime Log Analytics Demo</h1>
+        <h2 class="center">(Log Producer)</h2>
+        <div class="center"><button class="publis-button" onclick="main()">Publish</button></div>
+    </div>
     <ul id="details">
         <li><span>GDN URL:</span> pass.gdn.macrometa.io</li>
         <li><span>Stream Name:</span> c8locals.input_log_stream</li>
