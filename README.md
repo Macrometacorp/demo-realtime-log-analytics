@@ -10,6 +10,7 @@ Building real-time log analytics solution using GDN
 | [Global Data Network](https://gdn.paas.macrometa.io/) | xxxxxx | `xxxxxxxx`| 
 
 ### Log Producer
+To publish the logs please click here https://macrometacorp.github.io/tutorial-log-analytics/
 
 **Build:**
 TBD
