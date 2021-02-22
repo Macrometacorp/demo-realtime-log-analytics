@@ -5,6 +5,15 @@
 <script>
     let count = 0;
     const startTime = new Date().getTime();
+    const hostName = "https://api-prashant.eng.macrometa.io";
+    const logFileName = "testlogs.log";
+    const streamName = "c8locals.input_log_stream";
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // Empty the values if we decide to get the email/password from the URL
+    let email = "mm@macrometa.io";
+    let password = "Test1234";
+    let mmJwtToken;
 
     // Convert the message to string
     function convertToString(line){
@@ -22,24 +31,45 @@
         pulbishLog(eofLog);
     }
 
+    // Get the JWT Token
+    function getMMJwtToken(email, password){
+        $.ajax({
+            url: `${hostName}/_open/auth`,
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({"email": email, "password": password}),
+            datatype: 'json',
+            async: false,
+            success: function(result) {
+                mmJwtToken = result.jwt;
+                console.log("Got JWT token: ", result); 
+            },
+            error: function(err) {  
+                console.log('Failed in getMMJwtToken:' + err); 
+            },
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("Authorization", `bearer ${mmJwtToken}`);
+            }
+        });
+    }
+
     // Publish the incoming log to the stream
     function pulbishLog(log) {
         $.ajax({
-            url: 'https://api-prashant.eng.macrometa.io/_fabric/_system/_api/streams/c8locals.input_log_stream/publish?global=false',
+            url: `${hostName}/_fabric/_system/_api/streams/${streamName}/publish?global=false`,
             type: 'POST',
             contentType: 'application/json',
-            callback: '?',
             data: convertToString(log),
             datatype: 'application/json',
             async: false,
             success: function(result) { 
-                console.log(result); 
+                console.log("Success pulbishLog:", result); 
             },
             error: function(err) {  
-                console.log('Failed!' + err); 
+                console.log('Failed in pulbishLog for the log: ' + err); 
             },
             beforeSend: function (xhr) {
-                xhr.setRequestHeader("Authorization", "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjEuNjEzODk2MjU3NTIwNDMwN2UrNiwiZXhwIjoxNjEzOTM5NDU3LCJpc3MiOiJtYWNyb21ldGEiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJyb290IiwidGVuYW50IjoiX21tIn0=.hFeltAtpjna7IM20AQ_Qxr6P8ZKzZW0SFkS5-hWzQxQ=");
+                xhr.setRequestHeader("Authorization", `bearer ${mmJwtToken}`);
             }
         });
     }
@@ -56,13 +86,13 @@
     // Read the log file and start the publishing
     function main() {
         $.ajax({
-            url: 'https://raw.githubusercontent.com/Macrometacorp/tutorial-log-analytics/main/testlogs.log?token=ARWTGKNQHDVNPYLKZHUOGQ3AHNISC',
+            url: `https://raw.githubusercontent.com/Macrometacorp/tutorial-log-analytics/main/${logFileName}?token=ARWTGKNQHDVNPYLKZHUOGQ3AHNISC`,
             type: 'GET',
-            callback: '?',
             datatype: 'application/json',
             async: false,
             success: function(result) { 
-                console.log(result); 
+                console.log(result);
+                mmJwtToken = getMMJwtToken(email, password);
                 parseResult(result);
                 publishEOF();
                 const endTime = new Date().getTime();
@@ -70,19 +100,24 @@
                 console.log(`Published ${count} logs in ${time} seconds. It will take some time to reflect aggregated records in the collection.`);
             },
             error: function(err) { 
-                console.log('Failed to publish...', err); 
+                console.log('Failed in main:', err); 
             },
         });  
     }
 
     // Start the publishing on page load itself
     $( document ).ready(function() {
-        console.log( "Starting to publish..." );
-      //  main();
+        // Uncomment this if not if we decide to get the email/password from the URL
+        // const urlParams = new URLSearchParams(window.location.search);
+        // email = urlParams.get('email') !== null ? urlParams.get('email') : email;
+        // password = urlParams.get('password') !== null ? urlParams.get('password') : password;
+        // console.log( `Starting to publish... email:${email} -- password:${password}` );
+        console.log( `Logs will be published one by one soon...` );
     });
 </script>
 </head>
 <body>
     <h3>Macrometa Realtime Log Analytics Demo</h3></br>
+    <button onclick="main()">Publish</button>
 </body>
 </html>
