@@ -120,18 +120,17 @@
       text-align: center;
       margin: auto;
       width: 50%;
-      padding: 10px;
     }
 
     .main-header {
       margin-top: 25px;
     }
 
-    .publis-button:hover{
+    .publish-button:hover{
         background-color: #1971b3;
     }
 
-    .publis-button {
+    #publish-button {
         width: 200px;
         color: #fff;
         border:none;
@@ -151,6 +150,10 @@
         line-height: 1.5rem;
         margin: 0;
         padding: .5rem .75rem;
+    }
+
+    #button-container{
+        padding-top: 30px;
     }
 
     .details-table{
@@ -176,7 +179,7 @@
     <div id="head">
         <h1 class="center main-header">Macrometa Realtime Log Analytics Demo</h1>
         <h2 class="center">(Log Producer)</h2>
-        <div class="center"><button class="publis-button" onclick="main()">Publish</button></div>
+        <div id="button-container" class="center"><button id="publish-button" onclick="main()">Publish</button></div>
     </div>
     <ul id="details">
         <li><span>GDN URL:</span> pass.gdn.macrometa.io</li>
