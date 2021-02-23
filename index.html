@@ -5,14 +5,13 @@
 <script>
     let count = 0;
     const startTime = new Date().getTime();
-    const hostName = "https://api-prashant.eng.macrometa.io";
-    const logFileName = "server.log";
+    const logFileName = "testlogs.log"; //"server.log";
+    const logFileURL = `https://raw.githubusercontent.com/pzombade/mm-log-publisher/gh-pages/${logFileName}`;
     const streamName = "c8locals.input_log_stream";
-    const urlParams = new URLSearchParams(window.location.search);
+    let streamURL = `/_fabric/_system/_api/streams/${streamName}/publish?global=false`;
 
     // Empty the values if we decide to get the email/password from the URL
-    let email = "mm@macrometa.io";
-    let password = "Test1234";
+    let hostName, email, password;
     let mmJwtToken;
 
     // Convert the message to string
@@ -41,14 +40,11 @@
             datatype: 'json',
             async: false,
             success: function(result) {
-                mmJwtToken = result.jwt;
+                mmJwtToken = `bearer ${result.jwt}`;
                 console.log("Got JWT token: ", result); 
             },
             error: function(err) {  
                 console.log('Failed in getMMJwtToken:' + err); 
-            },
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader("Authorization", `bearer ${mmJwtToken}`);
             }
         });
     }
@@ -56,7 +52,7 @@
     // Publish the incoming log to the stream
     function pulbishLog(log) {
         $.ajax({
-            url: `${hostName}/_fabric/_system/_api/streams/${streamName}/publish?global=false`,
+            url: streamURL,
             type: 'POST',
             contentType: 'application/json',
             data: convertToString(log),
@@ -69,7 +65,7 @@
                 console.log('Failed in pulbishLog for the log: ' + err); 
             },
             beforeSend: function (xhr) {
-                xhr.setRequestHeader("Authorization", `bearer ${mmJwtToken}`);
+                xhr.setRequestHeader("Authorization", mmJwtToken);
             }
         });
     }
@@ -83,21 +79,33 @@
         }
     }
 
+    function setCredentials(){
+        hostName = $("#gdnUrl").val();
+        streamURL = hostName+streamURL;
+        email = $("#email").val();
+        password = $("#password").val();
+    }
+
     // Read the log file and start the publishing
-    function main() {
+    function start() {
+        $('#publish-button').prop('disabled', true);
+        setCredentials();
+        
+        //Read the log file and publish events
         $.ajax({
-            url: `https://raw.githubusercontent.com/Macrometacorp/tutorial-log-analytics/main/${logFileName}?token=ARWTGKPVP4JCPIUIODEYGH3AHSUXA`,
+            url: logFileURL,
             type: 'GET',
             datatype: 'application/json',
             async: false,
             success: function(result) { 
                 console.log(result);
-                mmJwtToken = getMMJwtToken(email, password);
+                getMMJwtToken(email, password);
                 parseResult(result);
                 publishEOF();
                 const endTime = new Date().getTime();
                 const time = ( endTime - startTime) / 1000;
                 console.log(`Published ${count} logs in ${time} seconds. It will take some time to reflect aggregated records in the collection.`);
+                $('#publish-button').prop('disabled', false);
             },
             error: function(err) { 
                 console.log('Failed in main:', err); 
@@ -107,11 +115,6 @@
 
     // Start the publishing on page load itself
     $( document ).ready(function() {
-        // Uncomment this if not if we decide to get the email/password from the URL
-        // const urlParams = new URLSearchParams(window.location.search);
-        // email = urlParams.get('email') !== null ? urlParams.get('email') : email;
-        // password = urlParams.get('password') !== null ? urlParams.get('password') : password;
-        // console.log( `Starting to publish... email:${email} -- password:${password}` );
         console.log( `Logs will be published one by one soon...` );
     });
 </script>
@@ -119,7 +122,6 @@
     .center {
       text-align: center;
       margin: auto;
-      width: 50%;
     }
 
     .main-header {
@@ -173,27 +175,92 @@
     li {
         margin-top: 10px;
     }
+    
+/* Login Form Styling starts */
+* {
+  box-sizing: border-box;
+}
+body {
+  font-family: 'open sans', helvetica, arial, sans;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+.log-form {
+  width: 420px;
+  min-width: 320px;
+  max-width: 475px;
+  background: #fff;
+  /*
+   -webkit-transform: translate(-50%, -50%);
+  -moz-transform: translate(-50%, -50%);
+  -o-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  */
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.25);
+}
+@media (max-width: 40em) {
+  .log-form {
+    margin: 2.5% auto 0 auto;
+    left: 0%;
+    -webkit-transform: translate(0%, 0%);
+    -moz-transform: translate(0%, 0%);
+    -o-transform: translate(0%, 0%);
+    -ms-transform: translate(0%, 0%);
+    transform: translate(0%, 0%);
+  }
+}
+.log-form form {
+  width: 100%;
+  padding: 2em;
+}
+
+.log-form input {
+  margin: auto auto;
+  width: 100%;
+  margin-bottom: 2em;
+  border: none;
+  border-bottom: 1px solid #eaeaea;
+  color: #757575;
+}
+.log-form input:focus {
+  outline: none;
+}
 </style>
 </head>
 <body>
     <div id="head">
         <h1 class="center main-header">Macrometa Realtime Log Analytics Demo</h1>
         <h2 class="center">(Log Producer)</h2>
-        <div id="button-container" class="center"><button id="publish-button" onclick="main()">Publish</button></div>
+        <div id="button-container" class="center">
+            <div class="log-form center"><!-- Start login form -->
+                <form>
+                    <input value="https://api-prashant.eng.macrometa.io" id="gdnUrl" type="text" title="GDN URL" placeholder="GDN URL"/>
+                   <input value="mm@macrometa.io" id="email" type="text" title="User Name" placeholder="User Name" />
+                   <input value="" id="password" type="password" title="password" placeholder="password"/>
+                   <button id="publish-button" onclick="start()">Publish</button>
+                </form>
+               </div><!-- End login form -->
+        </div>
     </div>
     <ul id="details">
-        <li><span>GDN URL:</span> pass.gdn.macrometa.io</li>
+        <li><span>GDN URL:</span> https://gdn.paas.macrometa.io</li>
         <li><span>Stream Name:</span> c8locals.input_log_stream</li>
         <li><span>Log records:</span> 21,237</li>
     </ul>
     <ul id="logs">
         <li><span>Log Records Sample:</span></li>
-        <li>216.244.66.230 - - [19/Dec/2020:14:14:26 +0100] "GET /robots.txt HTTP/1.1" 200 304 "-" "Mozilla/5.0 (compatible; DotBot/1.1; http://www.opensiteexplorer.org/dotbot, help@moz.com)" "-"</li>
-        <li>54.36.148.92 - - [19/Dec/2020:14:16:44 +0100] "GET /index.php?option=com_phocagallery&view=category&id=2%3Awinterfotos&Itemid=53 HTTP/1.1" 200 30662 "-" "Mozilla/5.0 (compatible; AhrefsBot/7.0; +http://ahrefs.com/robot/)" "-"</li>
-        <li>92.101.35.224 - - [19/Dec/2020:14:29:21 +0100] "GET /administrator/index.php HTTP/1.1" 200 4263 "" "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)" "-"</li>
-        <li>73.166.162.225 - - [19/Dec/2020:14:58:59 +0100] "GET /apache-log/access.log HTTP/1.1" 200 1299 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.101 Safari/537.36" "-"</li>
-        <li>73.166.162.225 - - [19/Dec/2020:14:58:59 +0100] "GET /favicon.ico HTTP/1.1" 404 217 "http://www.almhuette-raith.at/apache-log/access.log" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.101 Safari/537.36" "-"</li>
-        <li>54.36.148.108 - - [19/Dec/2020:15:09:30 +0100] "GET /robots.txt HTTP/1.1" 200 304 "-" "Mozilla/5.0 (compatible; AhrefsBot/7.0; +http://ahrefs.com/robot/)" "-"</li>
-    </ul>
+        <li> 
+        <textarea rows="12" style="width: 97%;" readonly>
+216.244.66.230 - - [19/Dec/2020:14:14:26 +0100] "GET /robots.txt HTTP/1.1" 200 304 "-" "Mozilla/5.0 (compatible; DotBot/1.1; http://www.opensiteexplorer.org/dotbot, help@moz.com)" "-"
+54.36.148.92 - - [19/Dec/2020:14:16:44 +0100] "GET /index.php?option=com_phocagallery&view=category&id=2%3Awinterfotos&Itemid=53 HTTP/1.1" 200 30662 "-" "Mozilla/5.0 (compatible; AhrefsBot/7.0; +http://ahrefs.com/robot/)" "-"
+92.101.35.224 - - [19/Dec/2020:14:29:21 +0100] "GET /administrator/index.php HTTP/1.1" 200 4263 "" "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)" "-"
+73.166.162.225 - - [19/Dec/2020:14:58:59 +0100] "GET /apache-log/access.log HTTP/1.1" 200 1299 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.101 Safari/537.36" "-"
+73.166.162.225 - - [19/Dec/2020:14:58:59 +0100] "GET /favicon.ico HTTP/1.1" 404 217 "http://www.almhuette-raith.at/apache-log/access.log" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.101 Safari/537.36" "-"
+54.36.148.108 - - [19/Dec/2020:15:09:30 +0100] "GET /robots.txt HTTP/1.1" 200 304 "-" "Mozilla/5.0 (compatible; AhrefsBot/7.0; +http://ahrefs.com/robot/)" "-"
+         </textarea></li>       
+        </ul>
 </body>
 </html>
