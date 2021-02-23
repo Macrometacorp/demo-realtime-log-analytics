@@ -7,7 +7,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
 
-    const logFileURL = "https://raw.githubusercontent.com/pzombade/mm-log-publisher/gh-pages/server.log"; //server / testlogs;
+    const logFileURL = "https://raw.githubusercontent.com/pzombade/mm-log-publisher/gh-pages/testlogs.log"; //server / testlogs;
     const streamName = "c8locals.input_log_stream";
     const startTime = new Date().getTime();
     let streamURL = `/_fabric/_system/_api/streams/${streamName}/publish?global=false`;
@@ -168,8 +168,17 @@
         padding: .5rem .75rem;
     }
 
-    #button-container{
-        padding-top: 30px;
+    #form-container{
+        padding-top: 60px;
+    }
+
+    #head {
+        margin-top: 60px;
+    }
+
+    #details {
+        margin-top: 70px;
+        margin-bottom: 50px;
     }
 
     .details-table{
@@ -248,7 +257,7 @@ body {
     <div id="head">
         <h1 class="center main-header">Macrometa Realtime Log Analytics Demo</h1>
         <h2 class="center">(Log Producer)</h2>
-        <div id="button-container" class="center">
+        <div id="form-container" class="center">
             <div class="log-form center"><!-- Start login form -->
                 <form>
                    <input value="https://api-prashant.eng.macrometa.io" id="gdnUrl" type="text" title="GDN URL" placeholder="GDN URL"/>
