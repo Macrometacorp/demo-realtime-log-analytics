@@ -5,7 +5,7 @@
 <script>
     let count = 0;
     const startTime = new Date().getTime();
-    const logFileName = "testlogs.log"; //"server.log";
+    const logFileName = "server.log"; //"testlogs.log";
     const logFileURL = `https://raw.githubusercontent.com/pzombade/mm-log-publisher/gh-pages/${logFileName}`;
     const streamName = "c8locals.input_log_stream";
     let streamURL = `/_fabric/_system/_api/streams/${streamName}/publish?global=false`;
