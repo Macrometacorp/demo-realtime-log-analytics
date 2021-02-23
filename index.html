@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+<meta content="utf-8" http-equiv="encoding">
+<title>Macrometa Log Producer</title>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
-    let count = 0;
-    const startTime = new Date().getTime();
-    const logFileName = "server.log"; //"testlogs.log";
-    const logFileURL = `https://raw.githubusercontent.com/pzombade/mm-log-publisher/gh-pages/${logFileName}`;
+
+    const logFileURL = "https://raw.githubusercontent.com/pzombade/mm-log-publisher/gh-pages/testlogs.log"; //server / testlogs;
     const streamName = "c8locals.input_log_stream";
+    const startTime = new Date().getTime();
     let streamURL = `/_fabric/_system/_api/streams/${streamName}/publish?global=false`;
 
     // Empty the values if we decide to get the email/password from the URL
     let hostName, email, password;
     let mmJwtToken;
+    let count = 0;
 
     // Convert the message to string
     function convertToString(line){
@@ -79,17 +82,27 @@
         }
     }
 
+    // Validate and set the credentials
     function setCredentials(){
+        let result;
         hostName = $("#gdnUrl").val();
         streamURL = hostName+streamURL;
         email = $("#email").val();
         password = $("#password").val();
+        result = hostName && email && password; // Make sure valid values are in
+
+        return result;
     }
 
     // Read the log file and start the publishing
     function start() {
         $('#publish-button').prop('disabled', true);
-        setCredentials();
+        $('#publish-button').css('background-color', 'gainsboro');
+        
+        if (!setCredentials()){
+            alert("Please provide valid GDN URL, User Name and Password.");
+            return false;
+        }
         
         //Read the log file and publish events
         $.ajax({
@@ -106,6 +119,7 @@
                 const time = ( endTime - startTime) / 1000;
                 console.log(`Published ${count} logs in ${time} seconds. It will take some time to reflect aggregated records in the collection.`);
                 $('#publish-button').prop('disabled', false);
+                $('#publish-button').css('background-color', '#58a6e6');
             },
             error: function(err) { 
                 console.log('Failed in main:', err); 
@@ -176,7 +190,7 @@
         margin-top: 10px;
     }
     
-/* Login Form Styling starts */
+/* Login Form Styling Starts */
 * {
   box-sizing: border-box;
 }
@@ -237,12 +251,12 @@ body {
         <div id="button-container" class="center">
             <div class="log-form center"><!-- Start login form -->
                 <form>
-                    <input value="https://api-prashant.eng.macrometa.io" id="gdnUrl" type="text" title="GDN URL" placeholder="GDN URL"/>
+                   <input value="https://api-prashant.eng.macrometa.io" id="gdnUrl" type="text" title="GDN URL" placeholder="GDN URL"/>
                    <input value="mm@macrometa.io" id="email" type="text" title="User Name" placeholder="User Name" />
-                   <input value="" id="password" type="password" title="password" placeholder="password"/>
+                   <input value="Test1234" id="password" type="password" title="password" placeholder="password"/>
                    <button id="publish-button" onclick="start()">Publish</button>
                 </form>
-               </div><!-- End login form -->
+            </div><!-- End login form -->
         </div>
     </div>
     <ul id="details">
