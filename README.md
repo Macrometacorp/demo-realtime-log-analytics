@@ -42,7 +42,6 @@ TBD
 ### Stream Workers
 
 **log_processor:**
-```
 @App:name("log_processor")
 @App:description("Process error logs")
 
