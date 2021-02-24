@@ -90,7 +90,7 @@ function setCredentials(){
 function start() {
     $('#publish-button').prop('disabled', true);
     $('#publish-button').css('background-color', 'gainsboro');
-    $('*').css('cursor', 'wait'); 
+    $('html,body').css('cursor','wait'); 
     
     if (!setCredentials()){
         alert("Please provide valid GDN URL, User Name and Password.");
