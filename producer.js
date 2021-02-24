@@ -1,4 +1,4 @@
-const logFileURL = "https://raw.githubusercontent.com/pzombade/mm-log-publisher/gh-pages/testlogs.log"; //server / testlogs;
+const logFileURL = "https://raw.githubusercontent.com/pzombade/mm-log-publisher/gh-pages/server.log"; //server / testlogs;
 const streamName = "c8locals.input_log_stream";
 const startTime = new Date().getTime();
 let streamURL;
