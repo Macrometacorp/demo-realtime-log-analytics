@@ -12,31 +12,38 @@ Building real-time log analytics solution using GDN
 ### Log Producer
 To publish the logs please click here https://macrometacorp.github.io/tutorial-log-analytics/
 
+To publish the logs please click here https://macrometacorp.github.io/tutorial-log-analytics/
+
 **Build:**
 TBD
 
 **How to Run:**
 
 **On Federation:**
-> Create following CEP Apps in your federation
 > ```
+> Create and publish following Stream Workers in your federation:
 > 1. log_processor
 > 2. agg_code_processor
 > 3. agg_verb_processor
+> 
+> Following collections are created automatically:
+> 1. http_verb_agg_count (doc collection)
+> 2. http_code_agg_count (doc collection)
+> 3. http_error_msgs (doc collection)
+>
+> Note: If you have run this tutorial before, you may want to truncate the collections.
 > ```
 
 **On Development Machine:**
 > ```
 > git clone https://github.com/Macrometacorp/tutorial-log-analytics.git
 > cd tutorial-log-analytics
+> git fetch
+> git checkout gh-pages
 > 
-> // Configure federation details in app.js
-> const global_url = "https://gdn.paas.macrometa.io";
-> const userName = "demo@macrometa.io";
-> const password = "***************";
-> 
-> npm install
-> node app.js
+> Open index.html in browser.
+> Enter your federation details and click on Publish button. 
+> The logs will be published on `c8locals.input_log_stream`. The aggreation collections will be populated.
 > ```
 
 ### Stream Workers
