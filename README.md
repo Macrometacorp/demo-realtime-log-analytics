@@ -35,7 +35,7 @@ TBD
 
 **On Development Machine:**
 > ```
-> git clone https://macrometacorp.github.io/tutorial-log-analytics/
+> git clone https://github.com/Macrometacorp/tutorial-log-analytics.git
 > cd tutorial-log-analytics
 > git fetch
 > git checkout gh-pages
