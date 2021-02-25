@@ -19,13 +19,18 @@ TBD
 **How to Run:**
 
 **On Federation:**
-> Create and publish following Stream Workers in your federation.
 > ```
+> Create and publish following Stream Workers in your federation:
 > 1. log_processor
 > 2. agg_code_processor
 > 3. agg_verb_processor
 > 
-> The required collections and streams will be created automatically.
+> Following collections are created automatically:
+> 1. http_verb_agg_count (doc collection)
+> 2. http_code_agg_count (doc collection)
+> 3. http_error_msgs (doc collection)
+>
+> Note: If you have run this tutorial before, you may want to truncate the collections.
 > ```
 
 **On Development Machine:**
