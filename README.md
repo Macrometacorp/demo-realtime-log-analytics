@@ -12,10 +12,6 @@ Building real-time log analytics solution using GDN
 ### Log Producer
 To publish the logs please click here https://macrometacorp.github.io/tutorial-log-analytics/
 
-To publish the logs please click here https://macrometacorp.github.io/tutorial-log-analytics/
-
-**Build:**
-TBD
 
 **How to Run:**
 
