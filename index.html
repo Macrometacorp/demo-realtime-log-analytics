@@ -6,26 +6,22 @@
 <title>Macrometa Log Producer</title>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="./producer.js"></script>
-<script>
-    // Start the publishing on page load itself
-    $( document ).ready(function() {
-        console.log( `Logs will be published one by one soon...` );
-    });
-</script>
 <link rel="stylesheet" href="./producer.css"></link>
+<link rel="icon" type="image/png" href="./favicon.png"/>
 </head>
 <body>
     <div id="head">
-        <h1 class="center main-header">Macrometa Realtime Log Analytics Demo</h1>
-        <h2 class="center">(Log Producer)</h2>
+        <div class="center"><img src="./logo-moc-blue.png" /></div>
+        <h1 class="center main-header">Real-Time Log Analytics</h1>
         <div id="form-container" class="center">
-            <div class="log-form center"><!-- Start login form -->
+            <div class="log-form center"><!-- Start login form paas.gdn.macrometa.io demo@macrometa.io-->
                 <form>
-                    <div><span>GDN URL:</span><input value="paas.gdn.macrometa.io" id="gdnUrl" type="text" title="GDN URL" placeholder="GDN URL"/></div>
+                    <div id="msg"></div>
+                    <div><span>GDN URL:</span><input value="prashant.eng.macrometa.io" id="gdnUrl" type="text" title="GDN URL" placeholder="GDN URL"/></div>
                     <div><span>Fabric:</span><input value="_system" id="fabric" type="text" title="Fabric" placeholder="Fabric"/></div>
-                    <div><span>User Name:</span><input value="demo@macrometa.io" id="email" type="text" title="User Name" placeholder="User Name" /></div>
-                    <div><span>Password:</span><input value="" id="password" type="password" title="Password" placeholder="password"/></div>
-                   <button id="publish-button" onclick="start()">Publish</button>
+                    <div><span>User Name:</span><input value="mm@macrometa.io" id="email" type="text" title="User Name" placeholder="User Name" /></div>
+                    <div><span>Password:</span><input value="Test123" id="password" type="password" title="Password" placeholder="password"/></div>
+                   <input type="button" id="publishbtn" onclick="start()" value="Publish"/>
                 </form>
             </div><!-- End login form -->
         </div>
