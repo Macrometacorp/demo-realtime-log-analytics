@@ -8,11 +8,11 @@
     color: #00486F;
 }
 
-#publish-button:hover{
+#publishbtn:hover{
     background-color: #1971b3;
 }
 
-#publish-button {
+#publishbtn {
     width: 200px;
     color: #fff;
     border:none;
@@ -134,4 +134,9 @@ body {
 
 .log-form input:focus {
     outline: none;
+}
+
+div#msg {
+    text-align: center;
+    margin-bottom: 15px;
 }

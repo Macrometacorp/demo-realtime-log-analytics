@@ -1,4 +1,4 @@
-const logFileURL = "https://raw.githubusercontent.com/pzombade/mm-log-publisher/gh-pages/server.log"; //server / testlogs;
+const logFileURL = "https://raw.githubusercontent.com/pzombade/mm-log-publisher/gh-pages/server.log"; // server / testlogs / noramlized ;
 const streamName = "c8locals.input_log_stream";
 const startTime = new Date().getTime();
 let streamURL;
@@ -24,25 +24,6 @@ function publishEOF(){
     pulbishLog(eofLog);
 }
 
-// Get the JWT Token
-function getMMJwtToken(email, password){
-    $.ajax({
-        url: `${hostName}/_open/auth`,
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify({"email": email, "password": password}),
-        datatype: 'json',
-        async: false,
-        success: function(result) {
-            mmJwtToken = `bearer ${result.jwt}`;
-            console.log("Got JWT token: ", result); 
-        },
-        error: function(err) {  
-            console.log('Failed in getMMJwtToken:' + err); 
-        }
-    });
-}
-
 // Publish the incoming log to the stream
 function pulbishLog(log) {
     $.ajax({
@@ -50,13 +31,13 @@ function pulbishLog(log) {
         type: 'POST',
         contentType: 'application/json',
         data: convertToString(log),
-        datatype: 'application/json',
+        dataType: "json",
         async: false,
         success: function(result) { 
             // console.log("Success pulbishLog:", result); 
         },
         error: function(err) {  
-            console.log('Failed in pulbishLog for the log: ' + err); 
+            console.error('Failed in pulbishLog for the log: ', err); 
         },
         beforeSend: function (xhr) {
             xhr.setRequestHeader("Authorization", mmJwtToken);
@@ -67,14 +48,18 @@ function pulbishLog(log) {
 function parseResult(result){
     var lines = result.split("\n");
     for (var i = 0, len = lines.length; i < len; i++) {
-        //console.log("Read >> " + lines[i]);
         pulbishLog(lines[i]);
+        lines[i] = undefined;
         count++;
     }
 }
 
 // Validate the form fields and set the credentials
 function setCredentials(){
+    $("#msg").css("color", "#58a6e6").text("Verifying credentials...");
+    $('#publishbtn').prop('disabled', true);
+    $('#publishbtn').css('background-color', 'gainsboro');
+
     let isValidForm;
     hostName = `https://api-${$("#gdnUrl").val()}`;
     email = $("#email").val();
@@ -88,33 +73,57 @@ function setCredentials(){
 
 // Read the log file and start the publishing
 function start() {
-    $('#publish-button').prop('disabled', true);
-    $('#publish-button').css('background-color', 'gainsboro');
-    
     if (!setCredentials()){
-        alert("Please provide valid GDN URL, User Name and Password.");
         return false;
     }
     
-    //Read the log file and publish events
-    $.ajax({
-        url: logFileURL,
-        type: 'GET',
-        datatype: 'application/json',
-        async: false,
-        success: function(result) { 
-            console.log(result);
-            getMMJwtToken(email, password);
-            parseResult(result);
-            publishEOF();
-            const endTime = new Date().getTime();
-            const time = ( endTime - startTime) / 1000;
-            console.log(`Published ${count} logs in ${time} seconds. It will take some time to reflect aggregated records in the collection.`);
-            $('#publish-button').prop('disabled', false);
-            $('#publish-button').css('background-color', '#58a6e6');
-        },
-        error: function(err) { 
-            console.log('Failed in main:', err); 
-        },
-    });  
+    setTimeout(function () {
+        // Login and get the JWT Token
+        $.ajax({
+            url: `${hostName}/_open/auth`,
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({"email": email, "password": password}),
+            datatype: 'json',
+            async: false,
+            success: function(result) {
+                mmJwtToken = `bearer ${result.jwt}`;
+                console.log("Got JWT token:", result); 
+
+                //Read the log file and publish events
+                $.ajax({
+                    url: logFileURL,
+                    type: 'GET',
+                    datatype: 'application/json',
+                    async: false,
+                    success: function(logLines) {
+                        $("#msg").text("Log streaming in progress...").css("color", "#58a6e6");
+                        setTimeout(function () {
+                            parseResult(logLines);
+                            publishEOF();
+                            const endTime = new Date().getTime();
+                            const time = ( endTime - startTime) / 1000;
+        
+                            $('#publishbtn').prop('disabled', false);
+                            $('#publishbtn').css('background-color', '#58a6e6');
+                            $("#msg").text("Log streaming completed").css("color", "#58a6e6");
+                            console.log(`Published ${count} logs in ${time} seconds. It will take some time to reflect aggregated records in the collection.`);
+                        }, 1000);    
+                    },
+                    error: function(logFileError) {
+                        $('#publishbtn').prop('disabled', false);
+                        $('#publishbtn').css('background-color', '#58a6e6');
+                        $("#msg").text("Failed to get the log file.").css("color", "red");
+                        console.error('Error while getting the log file:', JSON.parse(logFileError));
+                    },
+                }); 
+            },
+            error: function(loginError) {
+                $('#publishbtn').prop('disabled', false);
+                $('#publishbtn').css('background-color', '#58a6e6');
+                $("#msg").text("Failed to login").css("color", "red");
+                console.error('Failed in loing:', JSON.parse(loginError)); 
+            }
+        });
+    }, 1000);
 }
