@@ -1,10 +1,8 @@
-const logFileURL = "https://raw.githubusercontent.com/pzombade/mm-log-publisher/gh-pages/server.log"; // server / testlogs / noramlized ;
-const streamName = "c8locals.input_log_stream";
+const logFileURL = "https://raw.githubusercontent.com/pzombade/mm-log-publisher/gh-pages/testlogs.log"; // server / testlogs / noramlized ;
 const startTime = new Date().getTime();
-let streamURL;
 
 // Empty the values if we decide to get the email/password from the URL
-let hostName, email, password;
+let hostName, email, password, streamURL, streamName;
 let mmJwtToken;
 let count = 0;
 
@@ -65,6 +63,7 @@ function setCredentials(){
     email = $("#email").val();
     password = $("#password").val();
     let fabricName = $("#fabric").val();
+    streamName = $("#streamName").val();
     streamURL = `${hostName}/_fabric/${fabricName}/_api/streams/${streamName}/publish?global=false`;
     isValidForm = hostName && email && password; // Make sure valid values are in
 
