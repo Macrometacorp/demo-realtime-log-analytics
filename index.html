@@ -11,26 +11,22 @@
 </head>
 <body>
     <div id="head">
-        <div class="center"><img src="./logo-moc-blue.png" /></div>
+        <div class="center"><img id="logo" src="./logo-moc-blue.png" /></div>
         <h1 class="center main-header">Real-Time Log Analytics</h1>
         <div id="form-container" class="center">
             <div class="log-form center"><!-- Start login form -->
                 <form>
                     <div id="msg"></div>
-                    <div><span>GDN URL:</span><input value="gdn.paas.macrometa.io" id="gdnUrl" type="text" title="GDN URL" placeholder="GDN URL"/></div>
+                    <div><span>GDN URL:</span><input value="prashant.eng.macrometa.io" id="gdnUrl" type="text" title="GDN URL" placeholder="GDN URL"/></div>
                     <div><span>Fabric:</span><input value="_system" id="fabric" type="text" title="Fabric" placeholder="Fabric"/></div>
-                    <div><span>User Name:</span><input value="demo@macrometa.io" id="email" type="text" title="User Name" placeholder="User Name" /></div>
-                    <div><span>Password:</span><input value="" id="password" type="password" title="Password" placeholder="password"/></div>
+                    <div><span>Stream:</span><input value="c8locals.input_log_stream" id="streamName" type="text" title="Stream Name" placeholder="Stream Name"/></div>
+                    <div><span>User Name:</span><input value="mm@macrometa.io" id="email" type="text" title="User Name" placeholder="User Name" /></div>
+                    <div><span>Password:</span><input value="Test1234" id="password" type="password" title="Password" placeholder="password"/></div>
                    <input type="button" id="publishbtn" onclick="start()" value="Publish"/>
                 </form>
             </div><!-- End login form -->
         </div>
     </div>
-    <ul id="details">
-        <li><span>GDN URL: </span>gdn.paas.macrometa.io</li>
-        <li><span>Stream Name: </span>c8locals.input_log_stream</li>
-        <li><span>Log records: </span>21,237</li>
-    </ul>
     <ul id="logs">
         <li><span>Log Records Sample:</span></li>
         <li> 
@@ -41,7 +37,7 @@
 73.166.162.225 - - [19/Dec/2020:14:58:59 +0100] "GET /apache-log/access.log HTTP/1.1" 200 1299 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.101 Safari/537.36" "-"
 73.166.162.225 - - [19/Dec/2020:14:58:59 +0100] "GET /favicon.ico HTTP/1.1" 404 217 "http://www.almhuette-raith.at/apache-log/access.log" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.101 Safari/537.36" "-"
 54.36.148.108 - - [19/Dec/2020:15:09:30 +0100] "GET /robots.txt HTTP/1.1" 200 304 "-" "Mozilla/5.0 (compatible; AhrefsBot/7.0; +http://ahrefs.com/robot/)" "-"
-         </textarea></li>       
+        </textarea></li>       
         </ul>
 </body>
 </html>

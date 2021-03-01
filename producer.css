@@ -34,6 +34,10 @@
     padding: .5rem .75rem;
 }
 
+#logo {
+    width: 225px;
+}
+
 #form-container{
     padding-top: 60px;
 }
@@ -67,6 +71,9 @@ li {
 
 #logstextarea {
     width: 97%;
+    background-color: black;
+    color: white;
+    padding: 10px;
 }
 
 
@@ -120,6 +127,7 @@ body {
     width: 80px;
     display: inline-block;
     font-size: smaller;
+    font-weight: bold;
     /* text-align: right; */
 }
 
