@@ -9225,7 +9225,12 @@ async function pulbishLog(line) {
     };
 
     const payloadObj = { payload: Buffer.from(JSON.stringify(message)).toString("base64") };
-    await producer.send(JSON.stringify(payloadObj));
+    
+    setTimeout(function () {
+        producer.send(JSON.stringify(payloadObj));
+    }, 1000); 
+
+    
 }
    
 
@@ -9346,6 +9351,5 @@ async function start() {
 window.publish = function(){
     start();
 }
-
 }).call(this)}).call(this,require("buffer").Buffer)
 },{"buffer":2,"jsc8":28}]},{},[54]);

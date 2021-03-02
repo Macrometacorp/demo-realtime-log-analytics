@@ -15,7 +15,12 @@ async function pulbishLog(line) {
     };
 
     const payloadObj = { payload: Buffer.from(JSON.stringify(message)).toString("base64") };
-    await producer.send(JSON.stringify(payloadObj));
+    
+    setTimeout(function () {
+        producer.send(JSON.stringify(payloadObj));
+    }, 1000); 
+
+    
 }
    
 
