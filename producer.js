@@ -1,56 +1,87 @@
-const logFileURL = "https://raw.githubusercontent.com/pzombade/mm-log-publisher/gh-pages/testlogs.log"; // server / testlogs / noramlized ;
-const startTime = new Date().getTime();
+const jsc8 = require('jsc8');
 
-// Empty the values if we decide to get the email/password from the URL
-let hostName, email, password, streamURL, streamName;
-let mmJwtToken;
-let count = 0;
+// Configure log file and input stream name if required
+const logFileURL = "https://raw.githubusercontent.com/pzombade/mm-log-publisher/gh-pages/server.log"; // server / testlogs / noramlized ;
+const consoleLogSize = 300; // number of logs to be shown in the console
 
-// Convert the message to string
-function convertToString(line){
+let startTime, count = 0;
+let producer, fabricName, hostName, email, password;
+
+
+// Publish the log on the producer stream
+async function pulbishLog(line) {
     const message = {
         "log":line,
     };
-    return JSON.stringify(message);    
+
+    const payloadObj = { payload: Buffer.from(JSON.stringify(message)).toString("base64") };
+    await producer.send(JSON.stringify(payloadObj));
 }
+   
 
 // Publish the EOF file message
 function publishEOF(){
     const eofFlag = "EOF";
     console.log("Sending EOF flag...");
-    const eofLog=`13.66.139.0 - - [12/Feb/2021:00:00:23 +0100] "${eofFlag} /index.php?option=com_phocagallery&view=category&id=1:almhuette-raith&Itemid=53 HTTP/1.1" 404 32653 "-" "Mozilla/5.0 (compatible; bingbot/2.0; +https://www.macrometa.com)" "-"`;
+    const eofLog=`14.66.139.0 - - [12/Feb/2021:00:00:23 +0100] "${eofFlag} /index.php?option=com_phocagallery&view=category&id=1:almhuette-raith&Itemid=53 HTTP/1.1" 404 32653 "-" "Mozilla/5.0 (compatible; bingbot/2.0; +https://www.macrometa.com)" "-"`;
     pulbishLog(eofLog);
+    const endTime = new Date().getTime();
+    const time = ( endTime - startTime) / 1000 / 60;
+
+    $('#publishbtn').prop('disabled', false);
+    $('#publishbtn').css('background-color', '#58a6e6');
+    $("#msg").text(`Log streaming completed. Published ${count} logs.`).css("color", "#58a6e6");
+    count = 0;
+    console.log(`Published ${count} logs in ${time} minutes. It will take some time to reflect aggregated records in the collection.`);
 }
 
-// Publish the incoming log to the stream
-function pulbishLog(log) {
-    $.ajax({
-        url: streamURL,
-        type: 'POST',
-        contentType: 'application/json',
-        data: convertToString(log),
-        dataType: "json",
-        async: false,
-        success: function(result) { 
-            // console.log("Success pulbishLog:", result); 
-        },
-        error: function(err) {  
-            console.error('Failed in pulbishLog for the log: ', err); 
-        },
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader("Authorization", mmJwtToken);
-        }
-    });
-}
 
-function parseResult(result){
+// Parse the file into single lines
+async function parseLogLines(result){
     var lines = result.split("\n");
-    for (var i = 0, len = lines.length; i < len; i++) {
-        pulbishLog(lines[i]);
+    const length = lines.length;
+    
+    for (var i = 0; i < length; i++) {
+
+        // Append the last 300 logs - TODO - This should be dynamic
+        // if(length-i <= consoleLogSize){
+        //     $("textarea#logstextarea").val($("textarea#logstextarea").val()+"\n"+lines[i]);
+        // }
+        
+        await pulbishLog(lines[i]);
         lines[i] = undefined;
         count++;
+
+        // When last line is reached publish EOF
+        if( i+1 >= lines.length ){
+            publishEOF();
+        }
     }
 }
+
+
+// Get the log file
+async function getLogFile() {
+    $.ajax({
+        url: logFileURL,
+        type: 'GET',
+        datatype: 'application/json',
+        async: false,
+        success: function(logLines) {
+            $("#msg").text("Log streaming in progress...").css("color", "#58a6e6");
+            setTimeout(function () {
+                parseLogLines(logLines);
+            }, 1000); 
+        },
+        error: function(logFileError) {
+            $('#publishbtn').prop('disabled', false);
+            $('#publishbtn').css('background-color', '#58a6e6');
+            $("#msg").text("Failed to get the log file.").css("color", "red");
+            console.error('Error while getting the log file:', JSON.parse(logFileError));
+        },
+    }); 
+}
+
 
 // Validate the form fields and set the credentials
 function setCredentials(){
@@ -58,71 +89,50 @@ function setCredentials(){
     $('#publishbtn').prop('disabled', true);
     $('#publishbtn').css('background-color', 'gainsboro');
 
-    let isValidForm;
-    hostName = `https://api-${$("#gdnUrl").val()}`;
+    hostName = `https://${$("#gdnUrl").val()}`;
     email = $("#email").val();
     password = $("#password").val();
-    let fabricName = $("#fabric").val();
+    fabricName = $("#fabric").val();
     streamName = $("#streamName").val();
-    streamURL = `${hostName}/_fabric/${fabricName}/_api/streams/${streamName}/publish?global=false`;
-    isValidForm = hostName && email && password; // Make sure valid values are in
+    const isValidForm = !!(hostName && email && password && fabricName && streamName); // Make sure valid values are in
 
     return isValidForm;
 }
 
-// Read the log file and start the publishing
-function start() {
-    if (!setCredentials()){
-        return false;
-    }
-    
-    setTimeout(function () {
-        // Login and get the JWT Token
-        $.ajax({
-            url: `${hostName}/_open/auth`,
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({"email": email, "password": password}),
-            datatype: 'json',
-            async: false,
-            success: function(result) {
-                mmJwtToken = `bearer ${result.jwt}`;
-                console.log("Got JWT token:", result); 
 
-                //Read the log file and publish events
-                $.ajax({
-                    url: logFileURL,
-                    type: 'GET',
-                    datatype: 'application/json',
-                    async: false,
-                    success: function(logLines) {
-                        $("#msg").text("Log streaming in progress...").css("color", "#58a6e6");
-                        setTimeout(function () {
-                            parseResult(logLines);
-                            publishEOF();
-                            const endTime = new Date().getTime();
-                            const time = ( endTime - startTime) / 1000;
-        
-                            $('#publishbtn').prop('disabled', false);
-                            $('#publishbtn').css('background-color', '#58a6e6');
-                            $("#msg").text("Log streaming completed").css("color", "#58a6e6");
-                            console.log(`Published ${count} logs in ${time} seconds. It will take some time to reflect aggregated records in the collection.`);
-                        }, 1000);    
-                    },
-                    error: function(logFileError) {
-                        $('#publishbtn').prop('disabled', false);
-                        $('#publishbtn').css('background-color', '#58a6e6');
-                        $("#msg").text("Failed to get the log file.").css("color", "red");
-                        console.error('Error while getting the log file:', JSON.parse(logFileError));
-                    },
-                }); 
-            },
-            error: function(loginError) {
-                $('#publishbtn').prop('disabled', false);
-                $('#publishbtn').css('background-color', '#58a6e6');
-                $("#msg").text("Failed to login").css("color", "red");
-                console.error('Failed in loing:', JSON.parse(loginError)); 
-            }
-        });
-    }, 1000);
+// Verify the credentials and prepare the client and producer
+async function start() {
+
+    startTime = new Date().getTime()
+    //$("textarea#logstextarea").val("");
+    
+    if (!setCredentials()){
+        $('#publishbtn').prop('disabled', false);
+        $('#publishbtn').css('background-color', '#58a6e6');  
+        alert("Please provide valid details. All fields are mandatory.");
+        return false;
+    }  
+
+    try{
+        const client = new jsc8({url: hostName, fabricName: fabricName});
+        await client.login(email, password);
+        //client.useFabric(fabricName);
+        const isLocalStream = streamName.startsWith("c8locals");
+        streamName = streamName.substring(streamName.indexOf(".") + 1);
+        producer = await client.createStreamProducer(streamName, isLocalStream);
+
+        // Start the processing
+        await producer.on("open", getLogFile);
+    }catch(error){
+        $('#publishbtn').prop('disabled', false);
+        $('#publishbtn').css('background-color', '#58a6e6');
+        $("#msg").text(`Failed to login: ${error.message}`).css("color", "red");
+        console.error('Failed in login in go', JSON.parse(error));
+    }
+}
+
+
+// Handle th Publish button from browser
+window.publish = function(){
+    start();
 }
