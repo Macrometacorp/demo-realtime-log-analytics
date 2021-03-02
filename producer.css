@@ -35,15 +35,16 @@
 }
 
 #logo {
-    width: 225px;
+    width: 200px;
 }
 
 #form-container{
-    padding-top: 60px;
+    padding-top: 35px;
 }
 
 #head {
     margin-top: 30px;
+    margin-bottom: 80px;
 }
 
 #details {
@@ -58,7 +59,8 @@
 
 ul{
     list-style-type: none;
-    margin-top: 30px;
+    margin-top: 60px;
+    margin-bottom: 60px;
 }
 
 li span{
@@ -74,6 +76,7 @@ li {
     background-color: black;
     color: white;
     padding: 10px;
+    margin-top: 20px;
 }
 
 
@@ -93,7 +96,6 @@ body {
 /* Login Form Styling Starts */
 
 .log-form {
-    width: 420px;
     min-width: 320px;
     max-width: 475px;
     background: #fff;
@@ -146,5 +148,5 @@ body {
 
 div#msg {
     text-align: center;
-    margin-bottom: 15px;
+    margin-bottom: 30px;
 }
