@@ -9211,7 +9211,7 @@ function extend() {
 const jsc8 = require('jsc8');
 
 // Configure log file and input stream name if required
-const logFileURL = "https://raw.githubusercontent.com/pzombade/mm-log-publisher/gh-pages/testlogs.log"; // server / testlogs / noramlized ;
+const logFileURL = "https://raw.githubusercontent.com/pzombade/mm-log-publisher/gh-pages/server.log"; // server / testlogs / noramlized ;
 const consoleLogSize = 300; // number of logs to be shown in the console
 
 let startTime, count = 0;
