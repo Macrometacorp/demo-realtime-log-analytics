@@ -13,14 +13,6 @@ Building real-time log analytics solution using GDN
 To publish the logs please click here https://macrometacorp.github.io/tutorial-log-analytics/
 
 
-**How To Build:**
-```
-git clone https://github.com/Macrometacorp/tutorial-log-analytics.git
-npm install
-browserify producer.js > bundle.js //required if you make any changes in the producer.js
-# open index.html in a browser
-```
-
 **How To Run:**
 
 **On Federation:**
@@ -44,10 +36,11 @@ browserify producer.js > bundle.js //required if you make any changes in the pro
 > cd tutorial-log-analytics
 > git fetch
 > git checkout gh-pages
-> 
-> Open index.html in browser.
-> Enter your federation details and click on Publish button. 
-> The logs will be published on `c8locals.input_log_stream`. The aggreation collections will be populated.
+> npm install
+> browserify producer.js > bundle.js //required if you make any changes in the producer.js
+> #Open index.html in browser.
+> #Enter your federation details and click on Publish button. 
+> #The logs will be published on `c8locals.input_log_stream`. The aggreation collections will be populated.
 > ```
 
 ### Stream Workers
@@ -364,14 +357,15 @@ RETURN doc
 
 ### Visualization
 
-Please refer below 'c8-grafana-plugin' for visualization.
+Please refer below 'c8-grafana-plugin' for visualization.<br/>
 https://github.com/Macrometacorp/c8-grafana-plugin
 
 
 ### Developer Notes
 `gh-pages` is the main branch.
 `index.html` renders the UI of https://macrometacorp.github.io/tutorial-log-analytics/ . The page refers to `bundle.js` script. `bundle.js` is bundled version of `producer.js` and all of its dependencies.
-Each time you update the `producer.js` you need to rebuild the `bundle.js` file. Use below command to do the same. Also make sure you chekin `bundle.js` along with `producer.js`
+Each time you update the `producer.js` you need to rebuild the `bundle.js` file.<br/>
+Use below command to do the same. Also make sure you chekin `bundle.js` along with `producer.js`<br/>
 `browserify producer.js > bundle.js`
 
 
