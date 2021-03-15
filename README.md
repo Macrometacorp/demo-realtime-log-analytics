@@ -13,7 +13,14 @@ Building real-time log analytics solution using GDN
 To publish the logs please click here https://macrometacorp.github.io/tutorial-log-analytics/
 
 
-**How to Run:**
+**How To Build:**
+```
+git clone https://github.com/Macrometacorp/tutorial-log-analytics.git
+npm install
+browserify producer.js > bundle.js
+```
+
+**How To Run:**
 
 **On Federation:**
 > ```
@@ -314,6 +321,7 @@ insert into put_in_cache;
 - http_code_agg_count (doc collection)
 - http_error_msgs (doc collection)
 
+
 ### Indexes
 
 TBD
@@ -345,14 +353,27 @@ It will apply search on `body` field of `http_error_msgs` collection.
 }
 ```
 
-On the above view lets execute below query to search and fetch all the documents those mention `Safari` in the body field.
+On the above view lets execute below query to search and fetch all the documents those mention `Safari` in the `body` field.
 
 ```
 FOR doc in c8search_view_http_error_msgs
-SEARCH ANALYZER(doc.body IN TOKENS('Safari', 'text_en'), 'text_en') SORT BM25(doc) desc 
+SEARCH ANALYZER(doc.body IN TOKENS('Safari', 'text_en'), 'text_en')
+SORT BM25(doc) desc 
 RETURN doc
 ```
+
+
 ### Visualization
 
-TBD
+Please refer below 'c8-grafana-plugin' for visualization.
+https://github.com/Macrometacorp/c8-grafana-plugin
+
+
+### Developer Notes
+`gh-pages` is the main branch.
+`index.html` renders the UI of https://macrometacorp.github.io/tutorial-log-analytics/ . The page refers to `bundle.js` script. `bundle.js` is bundled version of `producer.js` and all of its dependencies.
+Each time you update the `producer.js` you need to rebuild the `bundle.js` file. Use below command to do the same. Also make sure you chekin `bundle.js` along with `producer.js`
+`browserify producer.js > bundle.js`
+
+
 
