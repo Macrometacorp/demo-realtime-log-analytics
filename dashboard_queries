@@ -1,0 +1,31 @@
+-- Code_200 --
+FOR doc IN http_code_agg_counts  
+LIMIT 500
+RETURN {    
+ time: (doc.log.timestamp) ,
+ value : (doc.log["200"]) 
+}
+
+-- Code_404 --
+FOR doc IN http_code_agg_counts  
+LIMIT 500
+RETURN {    
+ time: (doc.log.timestamp) ,
+ value : (doc.log["404"]) 
+}
+
+-- Table_Verb_GET --
+FOR doc IN http_verb_agg_counts  
+LIMIT 500
+RETURN {    
+ time: (doc.log.timestamp) ,
+ value : (doc.log.GET) 
+}
+
+-- Verb_POST --
+FOR doc IN http_verb_agg_counts  
+LIMIT 500
+RETURN {    
+ time: (doc.log.timestamp) ,
+ value : (doc.log.POST) 
+}

@@ -17,7 +17,8 @@ To publish the logs please click here https://macrometacorp.github.io/tutorial-l
 ```
 git clone https://github.com/Macrometacorp/tutorial-log-analytics.git
 npm install
-browserify producer.js > bundle.js
+browserify producer.js > bundle.js //required if you make any changes in the producer.js
+# open index.html in a browser
 ```
 
 **How To Run:**
@@ -142,14 +143,13 @@ define function updateCache[javascript] return string {
 };
 
 
--- Convert the record into JSON object
+-- Convert the record into JSON
 define function toJson[javascript] return object {
     const cache = data[0];
     let json =  JSON.parse(cache);
-    
-    const timestamp = data[1];
-    json.timestamp = timestamp;
-    
+    const timestamp = new Date(data[1].replace(':',' ')).getTime() ;
+    json.timestamp =  timestamp;
+
     return  json;
 };
 
@@ -245,10 +245,9 @@ define function updateCache[javascript] return string {
 define function toJson[javascript] return object {
     const cache = data[0];
     let json =  JSON.parse(cache);
-    
-    const timestamp = data[1];
-    json.timestamp = timestamp;
-    
+    const timestamp = new Date(data[1].replace(':',' ')).getTime() ;
+    json.timestamp =  timestamp;
+
     return  json;
 };
 
