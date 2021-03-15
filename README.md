@@ -318,10 +318,40 @@ insert into put_in_cache;
 
 TBD
 
+
 ### Search
 
-TBD
+Create a View called `c8search_view_http_error_msgs` with below JSON object.
+It will apply search on `body` field of `http_error_msgs` collection.
 
+```
+{
+  "links": {
+    "http_error_msgs": {
+      "analyzers": [
+        "identity"
+      ],
+      "fields": {
+        "body": {
+          "analyzers": []
+        }
+      },
+      "includeAllFields": true,
+      "storeValues": "none",
+      "trackListPositions": false
+    }
+  },
+  "primarySort": []
+}
+```
+
+On the above view lets execute below query to search and fetch all the documents those mention `Safari` in the body field.
+
+```
+FOR doc in c8search_view_http_error_msgs
+SEARCH ANALYZER(doc.body IN TOKENS('Safari', 'text_en'), 'text_en') SORT BM25(doc) desc 
+RETURN doc
+```
 ### Visualization
 
 TBD
