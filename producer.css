@@ -4,14 +4,15 @@
 }
 
 .main-header {
-    margin-top: 25px;
+    margin-top: 10px;
+    color: #00486F;
 }
 
-#publish-button:hover{
+#publishbtn:hover{
     background-color: #1971b3;
 }
 
-#publish-button {
+#publishbtn {
     width: 200px;
     color: #fff;
     border:none;
@@ -33,12 +34,17 @@
     padding: .5rem .75rem;
 }
 
+#logo {
+    width: 200px;
+}
+
 #form-container{
-    padding-top: 60px;
+    padding-top: 35px;
 }
 
 #head {
-    margin-top: 60px;
+    margin-top: 50px;
+    margin-bottom: 80px;
 }
 
 #details {
@@ -53,7 +59,8 @@
 
 ul{
     list-style-type: none;
-    margin-top: 30px;
+    margin-top: 60px;
+    margin-bottom: 60px;
 }
 
 li span{
@@ -66,6 +73,10 @@ li {
 
 #logstextarea {
     width: 97%;
+    background-color: black;
+    color: white;
+    padding: 10px;
+    margin-top: 20px;
 }
 
 
@@ -85,7 +96,6 @@ body {
 /* Login Form Styling Starts */
 
 .log-form {
-    width: 420px;
     min-width: 320px;
     max-width: 475px;
     background: #fff;
@@ -119,6 +129,7 @@ body {
     width: 80px;
     display: inline-block;
     font-size: smaller;
+    font-weight: bold;
     /* text-align: right; */
 }
 
@@ -133,4 +144,9 @@ body {
 
 .log-form input:focus {
     outline: none;
+}
+
+div#msg {
+    text-align: center;
+    margin-bottom: 30px;
 }
