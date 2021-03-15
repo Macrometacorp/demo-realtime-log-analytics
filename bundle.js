@@ -9240,7 +9240,7 @@ function publishEOF(){
 
     $('#publishbtn').prop('disabled', false);
     $('#publishbtn').css('background-color', '#58a6e6');
-    $("#msg").text(`Log streaming completed. Published ${count} logs.`).css("color", "#58a6e6");
+    $("#msg").text(`Log streaming completed. Published ${count} log records.`).css("color", "#58a6e6");
     count = 0;
     console.log(`Published ${count} logs in ${time} minutes. It will take some time to reflect aggregated records in the collection.`);
 }
