@@ -11,7 +11,7 @@ Building real-time log analytics solution using GDN
 | [Global Data Network](https://gdn.paas.macrometa.io/) | xxxxxx | `xxxxxxxx`| 
 
 ### Log Producer
-To publish the logs please click here https://macrometacorp.github.io/tutorial-log-analytics/
+To publish the logs please click here https://macrometacorp.github.io/demo-realtime-log-analytics
 
 
 **How To Run:**
@@ -53,14 +53,14 @@ To publish the logs please click here https://macrometacorp.github.io/tutorial-l
 @App:description("Process error logs")
 
 
--- Read the incoming log and extract verb, code, url, timestamp
+-- Read the incoming log and extract verb, code, url, timestamp, body
 define function parseLog[javascript] return string {
 
     var log = data[0];
     var key = data[1];
     const regex = /"[^"]+"|[^\s]+/g;
     const splittedLine = log.match(regex).map(e => e.replace(/"(.+)"/, "$1"));
-    let [ipAddress, , , dateStr, seconds, headers, httpCode, ...remaining] = splittedLine;
+    let [ipAddress, , , dateStr, seconds, headers, httpCode, , , body] = splittedLine;
     const [httpVerb, url] = headers.split(" ");
     
     // -- Round of the seconds  Ex. 11/Feb/2020:13:55:23 +0100 to 11/Feb/2020:13:55:00
@@ -76,6 +76,8 @@ define function parseLog[javascript] return string {
        response = url;
     }else if(key=='timestamp'){
        response = timeStamp;
+    }else if(key=='body'){
+       response = body;
     }
     
     return response;
@@ -88,7 +90,7 @@ define stream input_log_stream(log string);
 
 @info("Store the error logs in http_error_msgs table")
 @store(type="c8db", collection="http_error_msgs", replication.type="local", @map(type='json'))
-define table http_error_msgs(timestamp string, verb string, code int, url string);
+define table http_error_msgs(timestamp string, verb string, code int, url string, body string);
 
 @info("Publish the log data on http_intermediate_agg_counts for further processing")
 @sink(type='c8streams', stream='http_intermediate_agg_counts', replication.type="local", @map(type='json'))
@@ -100,7 +102,8 @@ SELECT
     parseLog(log, "timestamp") as timestamp,
     parseLog(log, 'verb') as verb,
     convert(parseLog(log, 'code'), 'int') as code,
-    parseLog(log, 'url') as url
+    parseLog(log, 'url') as url,
+    parseLog(log, 'body') as body
 FROM input_log_stream[
     (convert(parseLog(log,'code'), 'int') >= 400) 
     and (convert(parseLog(log, 'code'), 'int') <= 599)
@@ -148,7 +151,6 @@ define function toJson[javascript] return object {
 
     return  json;
 };
-
 
 -- Collection does not support key having special caracter like / and :
 -- Replace such characters with _ (underscore)
@@ -365,12 +367,13 @@ RETURN doc
 Please refer below 'c8-grafana-plugin' for visualization.<br/>
 https://github.com/Macrometacorp/c8-grafana-plugin
 
+Grafana Dashboard:
 ![grafana_dashboard.png](readmeImages/grafana_dashboard.png)
 
 ### Developer Notes
 
 * `gh-pages` is the main branch.
-* `index.html` renders the UI of https://macrometacorp.github.io/tutorial-log-analytics/ . The page refers to `bundle.js` script. `bundle.js` is bundled version of `producer.js` and all of its dependencies.
+* `index.html` renders the UI of https://macrometacorp.github.io/demo-realtime-log-analytics . The page refers to `bundle.js` script. `bundle.js` is bundled version of `producer.js` and all of its dependencies.
 * Each time you update the `producer.js` you need to rebuild the `bundle.js` file.<br/>
 * Use below command to do the same. Also make sure you chekin `bundle.js` along with `producer.js`<br/>
 `browserify producer.js > bundle.js`

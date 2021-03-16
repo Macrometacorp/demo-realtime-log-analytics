@@ -16,10 +16,9 @@ define function updateCache[javascript] return string {
 define function toJson[javascript] return object {
     const cache = data[0];
     let json =  JSON.parse(cache);
-    
-    const timestamp = data[1];
-    json.timestamp = timestamp;
-    
+    const timestamp = new Date(data[1].replace(':',' ')).getTime() ;
+    json.timestamp =  timestamp;
+
     return  json;
 };
 
