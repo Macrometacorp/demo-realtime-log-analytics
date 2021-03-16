@@ -13,17 +13,15 @@ define function updateCache[javascript] return string {
 };
 
 
--- Convert the record into JSON object
+-- Convert the record into JSON
 define function toJson[javascript] return object {
     const cache = data[0];
     let json =  JSON.parse(cache);
-    
-    const timestamp = data[1];
-    json.timestamp = timestamp;
-    
+    const timestamp = new Date(data[1].replace(':',' ')).getTime() ;
+    json.timestamp =  timestamp;
+
     return  json;
 };
-
 
 -- Collection does not support key having special caracter like / and :
 -- Replace such characters with _ (underscore)
