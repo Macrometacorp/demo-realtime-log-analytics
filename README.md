@@ -46,7 +46,8 @@ To publish the logs please click here https://macrometacorp.github.io/tutorial-l
 ### Stream Workers
 
 **log_processor:**
-```
+
+```js
 @App:name("log_processor")
 @App:description("Process error logs")
 
@@ -120,7 +121,8 @@ INSERT into http_intermediate_agg_counts;
 
 
 **agg_code_processor:**
-```
+
+```js
 @App:name("agg_code_processor")
 @App:description("Process aggregated code counts")
 
@@ -219,7 +221,8 @@ insert into put_in_cache;
 
 
 **agg_verb_processor:**
-```
+
+```js
 @App:name("agg_verb_processor")
 @App:description("Process aggregated verb counts")
 
@@ -324,7 +327,8 @@ TBD
 Create a View called `c8search_view_http_error_msgs` with below JSON object.
 It will apply search on `body` field of `http_error_msgs` collection.
 
-```
+
+```js
 {
   "links": {
     "http_error_msgs": {
@@ -347,7 +351,7 @@ It will apply search on `body` field of `http_error_msgs` collection.
 
 On the above view lets execute below query to search and fetch all the documents those mention `Safari` in the `body` field.
 
-```
+```js
 FOR doc in c8search_view_http_error_msgs
 SEARCH ANALYZER(doc.body IN TOKENS('Safari', 'text_en'), 'text_en')
 SORT BM25(doc) desc 
@@ -362,10 +366,11 @@ https://github.com/Macrometacorp/c8-grafana-plugin
 
 
 ### Developer Notes
-`gh-pages` is the main branch.
-`index.html` renders the UI of https://macrometacorp.github.io/tutorial-log-analytics/ . The page refers to `bundle.js` script. `bundle.js` is bundled version of `producer.js` and all of its dependencies.
-Each time you update the `producer.js` you need to rebuild the `bundle.js` file.<br/>
-Use below command to do the same. Also make sure you chekin `bundle.js` along with `producer.js`<br/>
+
+* `gh-pages` is the main branch.
+* `index.html` renders the UI of https://macrometacorp.github.io/tutorial-log-analytics/ . The page refers to `bundle.js` script. `bundle.js` is bundled version of `producer.js` and all of its dependencies.
+* Each time you update the `producer.js` you need to rebuild the `bundle.js` file.<br/>
+* Use below command to do the same. Also make sure you chekin `bundle.js` along with `producer.js`<br/>
 `browserify producer.js > bundle.js`
 
 
