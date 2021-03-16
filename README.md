@@ -2,7 +2,7 @@
 
 Building real-time log analytics solution using GDN
 
-![Image](realtime-log-analytics2.png)
+![realtime-log-analytics2.png](readmeImages/realtime-log-analytics2.png)
 
 ### Setup
 
@@ -365,6 +365,7 @@ RETURN doc
 Please refer below 'c8-grafana-plugin' for visualization.<br/>
 https://github.com/Macrometacorp/c8-grafana-plugin
 
+![grafana_dashboard.png](readmeImages/grafana_dashboard.png)
 
 ### Developer Notes
 
