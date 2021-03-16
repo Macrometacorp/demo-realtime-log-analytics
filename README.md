@@ -367,6 +367,7 @@ RETURN doc
 Please refer below 'c8-grafana-plugin' for visualization.<br/>
 https://github.com/Macrometacorp/c8-grafana-plugin
 
+Grafana Dashboard:
 ![grafana_dashboard.png](readmeImages/grafana_dashboard.png)
 
 ### Developer Notes
