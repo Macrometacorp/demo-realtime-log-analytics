@@ -1,4 +1,4 @@
-# tutorial-log-analytics
+# demo-realtime-log-analytics
 Building real-time log analytics solution using GDN
 
 ![Image](realtime-log-analytics2.png)
