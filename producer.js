@@ -9,7 +9,7 @@ let producer, fabricName, hostName, email, password;
 
 
 // Publish the log on the producer stream
-async function pulbishLog(line) {
+async function publishLog(line) {
     const message = {
         "log":line,
     };
@@ -24,7 +24,7 @@ function publishEOF(){
     const eofFlag = "EOF";
     console.log("Sending EOF flag...");
     const eofLog=`14.66.139.0 - - [12/Feb/2021:00:00:23 +0100] "${eofFlag} /index.php?option=com_phocagallery&view=category&id=1:almhuette-raith&Itemid=53 HTTP/1.1" 404 32653 "-" "Mozilla/5.0 (compatible; bingbot/2.0; +https://www.macrometa.com)" "-"`;
-    pulbishLog(eofLog);
+    publishLog(eofLog);
     const endTime = new Date().getTime();
     const time = ( endTime - startTime) / 1000 / 60;
 
@@ -48,7 +48,7 @@ async function parseLogLines(result){
         //     $("textarea#logstextarea").val($("textarea#logstextarea").val()+"\n"+lines[i]);
         // }
         
-        await pulbishLog(lines[i]);
+        await publishLog(lines[i]);
         lines[i] = undefined;
         count++;
 
