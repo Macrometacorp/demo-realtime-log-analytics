@@ -84,7 +84,7 @@ define function parseLog[javascript] return string {
 
 
 @info("Read logs from input_log_stream stream")
-@source(type="c8streams", stream.list="input_log_stream", replication.type="local", @map(type='json'))
+@source(type="c8streams", stream.list="input_log_stream", replication.type="global", @map(type='json'))
 define stream input_log_stream(log string);
 
 @info("Store the error logs in http_error_msgs table")
@@ -92,7 +92,7 @@ define stream input_log_stream(log string);
 define table http_error_msgs(timestamp string, verb string, code int, url string, body string);
 
 @info("Publish the log data on http_intermediate_agg_counts for further processing")
-@sink(type='c8streams', stream='http_intermediate_agg_counts', replication.type="local", @map(type='json'))
+@sink(type='c8streams', stream='http_intermediate_agg_counts', replication.type="global", @map(type='json'))
 define stream http_intermediate_agg_counts(timestamp string, verb string, code int, url string);
 
 
@@ -161,7 +161,7 @@ define function getKey[javascript] return string {
 @store(type='c8db', collection='http_code_agg_counts', replication.type="local", @map(type='json'))
 define table http_code_agg_counts(log object);
 
-@source(type='c8streams', stream.list='http_intermediate_agg_counts', replication.type="local", @map(type='json'))
+@source(type='c8streams', stream.list='http_intermediate_agg_counts', replication.type="global", @map(type='json'))
 define stream http_intermediate_agg_counts(timestamp string, verb string, code int, url string);
 
 @store(type='c8streams', collection='put_in_cache', replication.type="local", @map(type='json'))
@@ -256,7 +256,7 @@ define function getKey[javascript] return string {
 };
 
 
-@source(type='c8streams', stream.list='http_intermediate_agg_counts', replication.type="local", @map(type='json'))
+@source(type='c8streams', stream.list='http_intermediate_agg_counts', replication.type="global", @map(type='json'))
 define stream http_intermediate_agg_counts(timestamp string, verb string, code int, url string);
 
 @store(type='c8db', collection='http_verb_agg_counts', replication.type="local", @map(type='json'))
