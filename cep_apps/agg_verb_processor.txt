@@ -29,13 +29,13 @@ define function getKey[javascript] return string {
 };
 
 
-@source(type='c8streams', stream.list='http_intermediate_agg_counts', replication.type="local", @map(type='json'))
+@source(type='c8streams', stream.list='http_intermediate_agg_counts', replication.type="global", @map(type='json'))
 define stream http_intermediate_agg_counts(timestamp string, verb string, code int, url string);
 
-@store(type='c8db', collection='http_verb_agg_counts', replication.type="local", @map(type='json'))
+@store(type='c8db', collection='http_verb_agg_counts', replication.type="global", @map(type='json'))
 define table http_verb_agg_counts(log object);
 
-@store(type='c8streams', collection='put_in_cache', replication.type="local", @map(type='json'))
+@store(type='c8streams', collection='put_in_cache', replication.type="global", @map(type='json'))
 define stream put_in_cache(isVerbPut bool, isTimestampPut bool,oldData bool);
 
 -- Maintain timestamp from the log in the cache
