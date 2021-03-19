@@ -47,7 +47,7 @@ Building real-time log analytics solution using GDN
 
 **log_processor:**
 
-```js
+```
 @App:name("log_processor")
 @App:description("Process error logs")
 
@@ -125,7 +125,7 @@ INSERT into http_intermediate_agg_counts;
 
 **agg_code_processor:**
 
-```js
+```
 @App:name("agg_code_processor")
 @App:description("Process aggregated code counts")
 
@@ -224,7 +224,7 @@ insert into put_in_cache;
 
 **agg_verb_processor:**
 
-```js
+```
 @App:name("agg_verb_processor")
 @App:description("Process aggregated verb counts")
 
