@@ -7,24 +7,26 @@ const consoleLogSize = 300; // number of logs to be shown in the console
 let startTime, count = 0;
 let producer, fabricName, hostName, email, password;
 
-
+function delay(ms){
+    return new Promise(resolve=>setTimeout(resolve,ms))
+}
 // Publish the log on the producer stream
-async function publishLog(line) {
+async function publishLog(line,counts) {
     const message = {
         "log":line,
     };
-
+    if(counts%100===0 && counts!==0){
+    await delay(1000);
+    }
     const payloadObj = { payload: Buffer.from(JSON.stringify(message)).toString("base64") };
     await producer.send(JSON.stringify(payloadObj));
 }
-   
-
 // Publish the EOF file message
-function publishEOF(){
+async function publishEOF(){
     const eofFlag = "EOF";
     console.log("Sending EOF flag...");
     const eofLog=`14.66.139.0 - - [12/Feb/2021:00:00:23 +0100] "${eofFlag} /index.php?option=com_phocagallery&view=category&id=1:almhuette-raith&Itemid=53 HTTP/1.1" 404 32653 "-" "Mozilla/5.0 (compatible; bingbot/2.0; +https://www.macrometa.com)" "-"`;
-    publishLog(eofLog);
+    await publishLog(eofLog,0);
     const endTime = new Date().getTime();
     const time = ( endTime - startTime) / 1000 / 60;
 
@@ -48,7 +50,7 @@ async function parseLogLines(result){
         //     $("textarea#logstextarea").val($("textarea#logstextarea").val()+"\n"+lines[i]);
         // }
         
-        await publishLog(lines[i]);
+        await publishLog(lines[i],i);
         lines[i] = undefined;
         count++;
 
