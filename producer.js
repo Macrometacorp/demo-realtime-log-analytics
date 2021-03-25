@@ -15,7 +15,7 @@ async function publishLog(line,counts) {
     const message = {
         "log":line,
     };
-    if( counts % 100 === 0 && counts !== 0){
+    if( counts % 500 === 0 && counts !== 0){
     await delay(1000);
     }
     const payloadObj = { payload: Buffer.from(JSON.stringify(message)).toString("base64") };
@@ -33,8 +33,8 @@ async function publishEOF(){
     $('#publishbtn').prop('disabled', false);
     $('#publishbtn').css('background-color', '#58a6e6');
     $("#msg").text(`Log streaming completed. Published ${count} log records.`).css("color", "#58a6e6");
-    count = 0;
     console.log(`Published ${count} logs in ${time} minutes. It will take some time to reflect aggregated records in the collection.`);
+    count = 0;
 }
 
 
