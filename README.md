@@ -87,6 +87,10 @@ define function parseLog[javascript] return string {
 @source(type="c8streams", stream.list="input_log_stream", replication.type="local", @map(type='json'))
 define stream input_log_stream(log string);
 
+@info("Read logs from input_log_stream stream and publish them to the logger")
+@sink(type="logger", priority='INFO')
+define stream input_logger_stream(log string);
+
 @info("Store the error logs in http_error_msgs table")
 @store(type="c8db", collection="http_error_msgs", replication.type="global", @map(type='json'))
 define table http_error_msgs(timestamp string, verb string, code int, url string, body string);
@@ -95,6 +99,8 @@ define table http_error_msgs(timestamp string, verb string, code int, url string
 @sink(type='c8streams', stream='http_intermediate_agg_counts', replication.type="local", @map(type='json'))
 define stream http_intermediate_agg_counts(timestamp string, verb string, code int, url string);
 
+select log from input_log_stream
+insert into input_logger_stream;
 
 @info("Store the error logs into http_error_msgs collection")
 SELECT
