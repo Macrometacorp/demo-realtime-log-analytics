@@ -15,7 +15,7 @@ async function publishLog(line,counts) {
     const message = {
         "log":line,
     };
-    if(counts%100===0 && counts!==0){
+    if( counts % 100 === 0 && counts !== 0){
     await delay(1000);
     }
     const payloadObj = { payload: Buffer.from(JSON.stringify(message)).toString("base64") };
