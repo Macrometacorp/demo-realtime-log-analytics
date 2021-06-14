@@ -3,9 +3,9 @@ const fs = require('fs');
 const readline = require('readline');
 
 // Configure the federation details
-const global_url = "https://prashant.eng.macrometa.io";
-const userName = "mm@macrometa.io";
-const password = "Test1234";
+const global_url = "xxxx";
+const userName = "xxx";
+const password = "xxx";
 
 // Configure log file and input stream name if required
 const logFilePath = "./testlogs.log"; // testlogs.log can be used for testing. It has fewer logs.
