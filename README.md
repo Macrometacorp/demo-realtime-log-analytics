@@ -325,10 +325,6 @@ insert into put_in_cache;
 - http_error_msgs (doc collection)
 
 
-### Indexes
-
-TBD
-
 
 ### Search
 
