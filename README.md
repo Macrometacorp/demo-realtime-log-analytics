@@ -8,7 +8,7 @@ Building real-time log analytics solution using GDN
 
 | **Federation** | **Email** | **Passsword** |
 |------------|----------|--------------|
-| [Global Data Network](https://gdn.paas.macrometa.io/) | xxxxxx | `xxxxxxxx`| 
+| [Global Data Network](https://gdn.paas.macrometa.io/) | demo@macrometa.io | `xxxxxxxx`| 
 | [Log File](https://raw.githubusercontent.com/pzombade/mm-log-publisher/gh-pages/server.log) | -- | -- |
 | [Log Publisher](https://macrometacorp.github.io/demo-realtime-log-analytics) | -- | -- |
 | [Analytics Dashboard](https://dashboards.poc.macrometa.io/d/tWcKbZ8Mz/demo-realtime-log-analytics?orgId=1) | -- | -- |
